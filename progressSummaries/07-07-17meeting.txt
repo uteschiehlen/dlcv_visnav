@@ -1,0 +1,20 @@
+## Meeting Fr, 07.07.17
+
+1. Set up
+- installed and set up Tensorflow on our own pcs as well as on our chair accounts
+
+2. Data
+- downloaded data
+- implemented data pre-processing
+- implemented reading data into Tensorflow
+
+3. Network
+- implemented the network structure definded in the paper
+- set up loss function and optimizer 
+- tried running it on the chairs pcs on a GPU, but got an error 
+
+4. Optical Flow
+- researched on good optical flow frameworks
+- chosen: opencv for python 
+- rather complicated to get opencv working in virtualenv: needed to install 'normal' on system, then create a symlink in the .evn to this globally installed version of opencv (https://stackoverflow.com/questions/19155603/can-opencv-be-installed-in-python-virtualenv-on-mac-mountain-lion)
+- started writing script to generate optical flow for driving dataset
