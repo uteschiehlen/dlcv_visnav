@@ -1,0 +1,17 @@
+## Meeting Fr, 14.07.17
+
+1.Image Conversion
+- converted RGB images into YUV images
+- use tf.uint8 to convert YUV to integer values (python uint8 cast does not work correctly)
+- saved exemplary images to files using the python image library for plausability check
+
+2.Network changes
+- added random shuffle to batch selection
+- changed batch size to prevent memory errors
+- added kernel regularizer for weight decay
+- added exponential learning rate decay
+
+3.Network evaluation
+- saved checkpoint data into .ckpt files
+- saved loss and learning rate into event file for analysis with tensorboard
+
