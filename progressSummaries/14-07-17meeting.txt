@@ -15,3 +15,11 @@
 - saved checkpoint data into .ckpt files
 - saved loss and learning rate into event file for analysis with tensorboard
 
+4.Optical flow
+- converted all image names to beginn with zeros
+- tried to load image sequence via cv2.VideoCapture: when specifying any filename to open, the whole python crashes with an uncaught exception -> load images manually after one another with cv2.imread
+- generated the optical flow images for the training data using Lucas-Kanade Optical Flow with tracking features detected by Shi-Tomasi
+- Questions to be determined:
+	1. do we want only the differences between to consecutive frames or
+	2. do we want the whole change beginning from first image unit last image (generating a line)
+- Problems: script gets really slow after approx. 184 images
