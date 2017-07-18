@@ -2,100 +2,111 @@ from __future__ import with_statement
 from PIL import Image as pimg
 import numpy as np
 import tensorflow as tf
+from tensorflow.contrib.learn.python.learn.estimators import model_fn as model_fn_lib
 import  os
 import preprocessing as pre
+import logging
+import time
+from datetime import datetime
+
+tf.logging.set_verbosity(tf.logging.INFO)
 
 BATCH_SIZE = 27
 NUM_THREADS = 16
 NUM_SAMPLES = 27243
 NUM_BATCHES = 1009
 MIN_QUEUE_SIZE = int(NUM_SAMPLES * 0.4)
-NUM_ITER = 10000
+NUM_ITER = 100000
+
+MOVING_AVERAGE_DECAY = 0.9999
+NUM_EPOCHS_PER_DECAY = 100.0       # Epochs after which learning rate decays.
+LEARNING_RATE_DECAY_FACTOR = 0.1   # Learning rate decay factor.
+INITIAL_LEARNING_RATE = 0.0001     # Initial learning rate.
+
+Y_MEAN =  0.473634918528
+U_MEAN = 0.0302694948176
+V_MEAN = -0.0508748753295
 
 
-NUM_EPOCHS_PER_DECAY = 350.0      # Epochs after which learning rate decays.
-LEARNING_RATE_DECAY_FACTOR = 0.1  # Learning rate decay factor.
-INITIAL_LEARNING_RATE = 0.1 # Initial learning rate.
 
 def train():
 	graph = tf.Graph()
 	with graph.as_default():
 		images, labels = read_data()
 
-		#batch normalization
-		images_norm = tf.layers.batch_normalization(images)
+		# First convolutional layer 
+		W_conv1 = weight_variable('conv_weights_1', [5, 5, 3, 24], 0.01)
+		b_conv1 = bias_variable('conv_biases_1', [24])
+		h_conv1 = tf.nn.relu(conv2d(images, W_conv1) + b_conv1)
 
-		#convolutional layers 
-			# add regularization
-		reg1 = tf.contrib.layers.l2_regularizer(scale= 0.0004)
-		conv2d_1 = tf.layers.conv2d(inputs=images_norm, filters=24, kernel_size=5, strides=1, padding='valid', activation=tf.nn.relu, 
-			kernel_initializer=tf.truncated_normal_initializer(stddev=0.01, dtype=tf.float32), bias_initializer=tf.constant_initializer(0.0), 
-			kernel_regularizer=reg1)
+		# Pooling layer - downsamples by 2X.
+		max_pool_1 = max_pool_2x2(h_conv1)
 
-		max_pool_1 = tf.layers.max_pooling2d(inputs=conv2d_1, pool_size=2, strides=2)
+		# Second convolutional layer 
+		W_conv2 = weight_variable('conv_weights_2', [5, 5, 24, 36], 24.0)
+		b_conv2 = bias_variable('conv_biases_2', [36])
+		h_conv2 = tf.nn.relu(conv2d(max_pool_1, W_conv2) + b_conv2)
 
-		reg2 = tf.contrib.layers.l2_regularizer(scale= 0.0004)
-		conv2d_2 = tf.layers.conv2d(inputs=max_pool_1, filters=36, kernel_size=5, strides=1, padding='valid', activation=tf.nn.relu, 
-			kernel_initializer=tf.truncated_normal_initializer(stddev=0.01, dtype=tf.float32), bias_initializer=tf.constant_initializer(0.0), 
-			kernel_regularizer=reg2)
+		# Second Pooling layer
+		max_pool_2 = max_pool_2x2(h_conv2)
 
-		max_pool_2 = tf.layers.max_pooling2d(inputs=conv2d_2, pool_size=2, strides=2, padding='same')
+		# Third convolutional layer 
+		W_conv3 = weight_variable('conv_weights_3', [5, 5, 36, 48], 36.0)
+		b_conv3 = bias_variable('conv_biases_3', [48])
+		h_conv3 = tf.nn.relu(conv2d(max_pool_2, W_conv3) + b_conv3)
 
-		reg3 = tf.contrib.layers.l2_regularizer(scale= 0.0004)
-		conv2d_3 = tf.layers.conv2d(inputs=max_pool_2, filters=48, kernel_size=5, strides=1, padding='valid', activation=tf.nn.relu, 
-			kernel_initializer=tf.truncated_normal_initializer(stddev=0.01, dtype=tf.float32), bias_initializer=tf.constant_initializer(0.0), 
-			kernel_regularizer=reg3)
+		# Third Pooling layer
+		max_pool_3 = max_pool_2x2(h_conv3)
 
-		max_pool_3 = tf.layers.max_pooling2d(inputs=conv2d_3, pool_size=2, strides=2, padding='same')
+		# Fourth convolutional layer 
+		W_conv4 = weight_variable('conv_weights_4', [3, 3, 48, 64], 48.0)
+		b_conv4 = bias_variable('conv_biases_4', [64])
+		h_conv4 = tf.nn.relu(conv2d(max_pool_3, W_conv4) + b_conv4)
 
-		reg4 = tf.contrib.layers.l2_regularizer(scale= 0.0004)
-		conv2d_4 = tf.layers.conv2d(inputs=max_pool_3, filters=64, kernel_size=3, strides=1, padding='valid', activation=tf.nn.relu, 
-			kernel_initializer=tf.truncated_normal_initializer(stddev=0.01, dtype=tf.float32), bias_initializer=tf.constant_initializer(0.0), 
-			kernel_regularizer=reg4)
-
-		reg5 = tf.contrib.layers.l2_regularizer(scale= 0.0004)
-		conv2d_5 = tf.layers.conv2d(inputs=conv2d_4, filters=64, kernel_size=3, strides=1, padding='valid', activation=tf.nn.relu, 
-			kernel_initializer=tf.truncated_normal_initializer(stddev=0.01, dtype=tf.float32), bias_initializer=tf.constant_initializer(0.0), 
-			kernel_regularizer=reg5)
+		# Fifth convolutional layer 
+		W_conv5 = weight_variable('conv_weights_5', [3, 3, 64, 64], 64.0)
+		b_conv5 = bias_variable('conv_biases_5', [64])
+		h_conv5 = tf.nn.relu(conv2d(h_conv4, W_conv5) + b_conv5)
 
 		#stack result into one dimensional vector by using -1 option
-		conv_flat = tf.reshape(conv2d_5, [BATCH_SIZE, -1]) 
+		conv_flat = tf.reshape(h_conv5, [BATCH_SIZE, -1]) 
 
-		#fully connected layers
-		fc_1 = tf.contrib.layers.fully_connected(inputs=conv_flat, num_outputs=1164)
+		# Fully connected layer 1
+		W_fc1 = weight_variable('fc_weights_1', [1 * 18 * 64, 1164], 1164.0)
+		b_fc1 = bias_variable('fc_biases_1', [1164])
+		h_fc1 = tf.nn.relu(tf.matmul(conv_flat, W_fc1) + b_fc1)
 
-		fc_2 = tf.contrib.layers.fully_connected(inputs=fc_1, num_outputs=100)
+		# Fully connected layer 2
+		W_fc2 = weight_variable('fc_weights_2', [1164, 100], 100.0)
+		b_fc2 = bias_variable('fc_biases_2', [100])
+		h_fc2 = tf.nn.relu(tf.matmul(h_fc1, W_fc2) + b_fc2)
 
-		fc_3 = tf.contrib.layers.fully_connected(inputs=fc_2, num_outputs=50)
+		# Fully connected layer 3
+		W_fc3 = weight_variable('fc_weights_3', [100, 10], 10.0)
+		b_fc3 = bias_variable('fc_biases_3', [10])
+		h_fc3 = tf.nn.relu(tf.matmul(h_fc2, W_fc3) + b_fc3)
 
-		fc_4 = tf.contrib.layers.fully_connected(inputs=fc_3, num_outputs=10)
-
-		fc_5 = tf.contrib.layers.fully_connected(inputs=fc_4, num_outputs=1)
-
-		#loss and gradient computation
-		loss = loss_func(fc_5, labels)				
-		tf.summary.scalar('loss', loss)
-
+		# Fully connected layer 4
+		W_fc4 = weight_variable('fc_weights_4', [10, 1], 1.0)
+		b_fc4 = bias_variable('fc_biases_4', [1])
+		h_fc4 = tf.matmul(h_fc3, W_fc4) + b_fc4
 
 		#exponential learning rate decay
 		global_step = tf.Variable(0, name='gloabal_step', trainable=False)
 		decay_steps = int(NUM_BATCHES * NUM_EPOCHS_PER_DECAY)
-  		lr = tf.train.exponential_decay(INITIAL_LEARNING_RATE,
-                                  global_step,
-                                  decay_steps,
-                                  LEARNING_RATE_DECAY_FACTOR,
-                                  staircase=True)
+		lr = tf.train.exponential_decay(INITIAL_LEARNING_RATE,
+										global_step,
+										decay_steps,
+										LEARNING_RATE_DECAY_FACTOR,
+										staircase=True)
 		tf.summary.scalar('learning_rate', lr)
 
+		#loss and gradient computation
+		loss,train_op = loss_func(h_fc4, labels, global_step, lr)
+		tf.summary.scalar('loss', loss)
 
-		optimizer = tf.train.AdamOptimizer(learning_rate=lr)
-		train_op = optimizer.minimize(loss, global_step=global_step)
-
-		#max_to_keep option to store all weights
+		# max_to_keep option to store all weights
 		saver = tf.train.Saver(tf.global_variables(), max_to_keep=None)
-
-		
-
 
 		#tensorflow session 
 		session = tf.Session()
@@ -116,18 +127,22 @@ def train():
 		#TODO file is empty
 		#ckpt = tf.train.get_checkpoint_state('./weights/')
 
-
-
+		logging.basicConfig(filename='/work/raymond/dlcv/dlcv_visnav/src/log/training.log',level=logging.INFO)
 
 
 		for x in range(NUM_ITER):
 			average_loss = 0.0
+			start_time = time.time()
+			curr_learnRate = 0.0
+
 			for y in range(NUM_BATCHES):
 				#print("testing...")
-				summary, train_out, lossVal, image_out, lr_out= session.run([merged, train_op, loss, images, lr])
+				summary, train_out, lossVal, image_out, lr_out = session.run([merged, train_op, loss, images, lr])
 				train_writer.add_summary(summary, x*NUM_ITER + y)
-				print("earning_rate: ", lr_out)
-				
+				print('iteration: ', x)
+				print("learning_rate: ", lr_out)
+				print('loss: ', lossVal)
+
 				# #test layers for output
 				#iout, lout = session.run([fc_5, labels])
 				#print(lout)
@@ -152,22 +167,27 @@ def train():
 				# #---------		
 
 				average_loss = average_loss+lossVal
-				#print("done")
+			# 	#print("done")
 				print('batch: ', y)
-				print(lossVal)
-				print(image_out.shape)
+				# print(lossVal)
+			# 	# print(image_out.shape)
+				curr_learnRate = lr_out
 				
-				#break
+			# 	#break
 			
-			average_loss = tf.divide(average_loss, BATCH_SIZE)
-			print("avergae_loss: ", average_loss)
+			average_loss = average_loss/NUM_BATCHES
+			print("average_loss: ", average_loss)
 			
 			str1 = str(x)
 			str2 = "check_files/model"
 			str3 = ".ckpt"
 			str4 = str2 + str1 + str3
 
-			save_path = saver.save(session, str4)
+			save_path = saver.save(session, str4, global_step=x)
+
+			content = datetime.now(), x, curr_learnRate, average_loss
+			logging.info(content)
+
 
 		
 		train_writer.close()
@@ -175,8 +195,88 @@ def train():
 		coord.request_stop()
 		coord.join(threads)
 
-def loss_func(logits, labels):
-	return tf.nn.l2_loss(tf.subtract(logits, labels))
+def loss_func(logits, labels, global_step, learning_rate):
+	loss = tf.reduce_mean((logits-labels)*(logits-labels))
+	 # Compute the moving average of all individual losses and the total loss.
+	loss_averages = tf.train.ExponentialMovingAverage(0.9, name='avg')
+	losses = tf.get_collection('losses')
+	loss_averages_op = loss_averages.apply(losses + [loss])
+
+	# Attach a scalar summary to all individual losses and the total loss; do the
+	# same for the averaged version of the losses.
+	for l in losses + [loss]:
+		# Name each loss as '(raw)' and name the moving average version of the loss
+		# as the original loss name.
+		tf.summary.scalar(l.op.name + '_raw_', l)
+		tf.summary.scalar(l.op.name, loss_averages.average(l))
+
+	# Compute gradients.
+	with tf.control_dependencies([loss_averages_op]):
+		opt = tf.train.AdamOptimizer(learning_rate)
+		grads = opt.compute_gradients(loss)
+
+	# Apply gradients.
+	apply_gradient_op = opt.apply_gradients(grads, global_step=global_step)
+
+	# Add histograms for trainable variables.
+	for var in tf.trainable_variables():
+		tf.summary.histogram(var.op.name, var)
+
+	# Add histograms for gradients.
+	for grad, var in grads:
+		if grad is not None:
+			tf.summary.histogram(var.op.name + '/gradients', grad)
+
+	# Track the moving averages of all trainable variables.
+	variable_averages = tf.train.ExponentialMovingAverage(MOVING_AVERAGE_DECAY, global_step)
+	variables_averages_op = variable_averages.apply(tf.trainable_variables())
+
+	with tf.control_dependencies([apply_gradient_op, variables_averages_op]):
+		train_op = tf.no_op(name='train')
+
+	return loss,train_op
+
+def conv2d(x, W):
+	"""conv2d returns a 2d convolution layer with full stride."""
+	return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='VALID')
+
+
+def max_pool_2x2(x):
+	"""max_pool_2x2 downsamples a feature map by 2X."""
+	return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+
+
+def weight_variable(name, shape, stddev):
+	"""weight_variable generates a weight variable of a given shape."""
+	initial = tf.truncated_normal_initializer(stddev=tf.rsqrt(stddev))
+	return _variable_with_weight_decay(name, shape, initial, wd=0.0004)
+
+
+def bias_variable(name, shape):
+	"""bias_variable generates a bias variable of a given shape."""
+	initial = tf.constant_initializer(0.1)
+	return _variable_with_weight_decay(name, shape, initial, wd=0.0004)
+
+def _variable_on_cpu(name, shape, initializer):
+	with tf.device('/cpu:0'):
+		var = tf.get_variable(name, shape,tf.float32,initializer)
+	return var
+
+def _variable_with_weight_decay(name, shape, initializer, wd=None):
+	"""
+	Helper function to create an initialized variable with weight decay
+	A weight decay act as a regularization, only is only added if specified.
+	In our case, it is the l2-norm of the weights multiply by the weight decay value.
+	"""
+
+	var = _variable_on_cpu(name, shape, initializer)
+
+	if wd is not None:
+		weight_decay = tf.multiply(tf.nn.l2_loss(var), wd, name='weight_loss')
+		tf.add_to_collection('losses', weight_decay)
+	return var
+
+
 
 
 
@@ -193,6 +293,8 @@ def read_data():
 	image = tf.cast(image, tf.float32)
 	label = tf.cast(label, tf.float32)
 
+	image = image/255
+
 	#convert image from RGB to YUV
 	conv_matrix = [[0.299, 0.589, 0.114], [-0.14713, -0.28886, 0.436],[0.615, -0.51499, -0.10001]]
 
@@ -203,8 +305,8 @@ def read_data():
 	stacked_yuv = tf.transpose(stacked_yuv)
 	yuv_image = tf.reshape(stacked_yuv, [tf.shape(image)[0], tf.shape(image)[1], tf.shape(image)[2]])
 
-
-
+	mean = tf.constant([Y_MEAN, U_MEAN, V_MEAN], dtype=tf.float32, shape=[1, 1, 3], name='yuv_mean')
+	yuv_image = yuv_image-mean
 
 	#shapes have to be defined for mini batch creation
 	yuv_image.set_shape([256, 455, 3])
@@ -222,10 +324,13 @@ def read_data():
 
 def get_data_from_disk(queue):
 	imageFile = queue[0]
+
+	# imageFile = "../driving_dataset/24.jpg"
 	content = tf.read_file(imageFile)
 	image = tf.image.decode_jpeg(content, channels=3)
 
 	label = queue[1]
+	# label = 11.7
 
 	return image, label
 
