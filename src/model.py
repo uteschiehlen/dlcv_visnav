@@ -11,17 +11,19 @@ from datetime import datetime
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
-BATCH_SIZE = 27
+# BATCH_SIZE = 44
+BATCH_SIZE = 88
 NUM_THREADS = 16
-NUM_SAMPLES = 27243
-NUM_BATCHES = 1009
+# NUM_SAMPLES = 27243
+NUM_SAMPLES = 12496
+NUM_BATCHES = int(NUM_SAMPLES/BATCH_SIZE)
 MIN_QUEUE_SIZE = int(NUM_SAMPLES * 0.4)
 NUM_ITER = 100000
 
 MOVING_AVERAGE_DECAY = 0.9999
-NUM_EPOCHS_PER_DECAY = 100.0       # Epochs after which learning rate decays.
-LEARNING_RATE_DECAY_FACTOR = 0.1   # Learning rate decay factor.
-INITIAL_LEARNING_RATE = 0.0001     # Initial learning rate.
+NUM_EPOCHS_PER_DECAY = 300.0       	# Epochs after which learning rate decays.
+LEARNING_RATE_DECAY_FACTOR = 0.1   	# Learning rate decay factor.
+INITIAL_LEARNING_RATE = 0.001     	# Initial learning rate.
 
 Y_MEAN =  0.473634918528
 U_MEAN = 0.0302694948176
@@ -32,6 +34,9 @@ V_MEAN = -0.0508748753295
 def train():
 	graph = tf.Graph()
 	with graph.as_default():
+
+		global_step = tf.Variable(0, name='global_step', trainable=False)
+
 		images, labels = read_data()
 
 		# First convolutional layer 
@@ -91,19 +96,25 @@ def train():
 		b_fc4 = bias_variable('fc_biases_4', [1])
 		h_fc4 = tf.matmul(h_fc3, W_fc4) + b_fc4
 
-		#exponential learning rate decay
-		global_step = tf.Variable(0, name='gloabal_step', trainable=False)
-		decay_steps = int(NUM_BATCHES * NUM_EPOCHS_PER_DECAY)
-		lr = tf.train.exponential_decay(INITIAL_LEARNING_RATE,
-										global_step,
-										decay_steps,
-										LEARNING_RATE_DECAY_FACTOR,
-										staircase=True)
-		tf.summary.scalar('learning_rate', lr)
+		y = tf.multiply(tf.atan(h_fc4), 2)
+
+		loss = loss_func(y, labels)
+
+		# #exponential learning rate decay
+		# global_step = tf.Variable(0, name='gloabal_step', trainable=False)
+		# decay_steps = int(NUM_BATCHES * NUM_EPOCHS_PER_DECAY)
+		# lr = tf.train.exponential_decay(INITIAL_LEARNING_RATE,
+		# 								global_step,
+		# 								decay_steps,
+		# 								LEARNING_RATE_DECAY_FACTOR,
+		# 								staircase=True)
+		# tf.summary.scalar('learning_rate', lr)
+
+		train_op, lr = optimize(loss, global_step)
 
 		#loss and gradient computation
-		loss,train_op = loss_func(h_fc4, labels, global_step, lr)
-		tf.summary.scalar('loss', loss)
+		# loss,train_op = loss_func(h_fc4, labels, global_step, lr)
+		# tf.summary.scalar('loss', loss)
 
 		# max_to_keep option to store all weights
 		saver = tf.train.Saver(tf.global_variables(), max_to_keep=None)
@@ -125,7 +136,8 @@ def train():
 
 		#save weights in directory
 		#TODO file is empty
-		#ckpt = tf.train.get_checkpoint_state('./weights/')
+		# ckpt = tf.train.get_checkpoint_state('./weights/')
+		# saver.restore(session, '/work/raymond/dlcv/dlcv_visnav/src/check_files/model99.ckpt-99')
 
 		logging.basicConfig(filename='/work/raymond/dlcv/dlcv_visnav/src/log/training.log',level=logging.INFO)
 
@@ -137,11 +149,15 @@ def train():
 
 			for y in range(NUM_BATCHES):
 				#print("testing...")
-				summary, train_out, lossVal, image_out, lr_out = session.run([merged, train_op, loss, images, lr])
+				summary, train_out, lossVal, image_out, label_out, lr_out = session.run([merged, train_op, loss, images, labels, lr])
 				train_writer.add_summary(summary, x*NUM_ITER + y)
 				print('iteration: ', x)
 				print("learning_rate: ", lr_out)
 				print('loss: ', lossVal)
+
+				# print(image_out.shape)
+				# print(label_out)				
+
 
 				# #test layers for output
 				#iout, lout = session.run([fc_5, labels])
@@ -190,30 +206,51 @@ def train():
 
 
 		
-		train_writer.close()
+		# train_writer.close()
 		#tensorflow threads 
 		coord.request_stop()
 		coord.join(threads)
 
-def loss_func(logits, labels, global_step, learning_rate):
-	loss = tf.reduce_mean((logits-labels)*(logits-labels))
-	 # Compute the moving average of all individual losses and the total loss.
+def loss_func(logits, labels):
+	loss = tf.reduce_mean(tf.squared_difference(logits, labels))
+	tf.add_to_collection('losses', loss)
+
+	return tf.add_n(tf.get_collection('losses'), name='total_loss')
+
+def _add_loss_summaries(total_loss):
+
 	loss_averages = tf.train.ExponentialMovingAverage(0.9, name='avg')
 	losses = tf.get_collection('losses')
-	loss_averages_op = loss_averages.apply(losses + [loss])
+	loss_averages_op = loss_averages.apply(losses + [total_loss])
 
-	# Attach a scalar summary to all individual losses and the total loss; do the
-	# same for the averaged version of the losses.
-	for l in losses + [loss]:
+	for l in losses + [total_loss]:
 		# Name each loss as '(raw)' and name the moving average version of the loss
 		# as the original loss name.
-		tf.summary.scalar(l.op.name + '_raw_', l)
+		tf.summary.scalar(l.op.name + ' (raw)', l)
 		tf.summary.scalar(l.op.name, loss_averages.average(l))
+
+	return loss_averages_op
+
+def optimize(total_loss, global_step):
+	# Variables that affect learning rate.
+	num_batches_per_epoch = NUM_SAMPLES / BATCH_SIZE
+	decay_steps = int(num_batches_per_epoch * NUM_EPOCHS_PER_DECAY)
+
+	# Decay the learning rate exponentially based on the number of steps.
+	lr = tf.train.exponential_decay(INITIAL_LEARNING_RATE,
+									global_step,
+									decay_steps,
+									LEARNING_RATE_DECAY_FACTOR,
+									staircase=True)
+	tf.summary.scalar('learning_rate', lr)
+
+	# Generate moving averages of all losses and associated summaries.
+	loss_averages_op = _add_loss_summaries(total_loss)
 
 	# Compute gradients.
 	with tf.control_dependencies([loss_averages_op]):
-		opt = tf.train.AdamOptimizer(learning_rate)
-		grads = opt.compute_gradients(loss)
+		opt = tf.train.AdamOptimizer(lr)
+		grads = opt.compute_gradients(total_loss)
 
 	# Apply gradients.
 	apply_gradient_op = opt.apply_gradients(grads, global_step=global_step)
@@ -228,13 +265,14 @@ def loss_func(logits, labels, global_step, learning_rate):
 			tf.summary.histogram(var.op.name + '/gradients', grad)
 
 	# Track the moving averages of all trainable variables.
-	variable_averages = tf.train.ExponentialMovingAverage(MOVING_AVERAGE_DECAY, global_step)
+	variable_averages = tf.train.ExponentialMovingAverage(
+			MOVING_AVERAGE_DECAY, global_step)
 	variables_averages_op = variable_averages.apply(tf.trainable_variables())
 
 	with tf.control_dependencies([apply_gradient_op, variables_averages_op]):
 		train_op = tf.no_op(name='train')
 
-	return loss,train_op
+	return train_op, lr
 
 def conv2d(x, W):
 	"""conv2d returns a 2d convolution layer with full stride."""
@@ -282,12 +320,21 @@ def _variable_with_weight_decay(name, shape, initializer, wd=None):
 
 def read_data():
 	#convert data to tensor
-	trainImages = tf.convert_to_tensor(pre.get_trainX());
-	trainLables = tf.convert_to_tensor(pre.get_trainY());
+	trainImages, trainLabels = pre.get_train()
+
+	trainImages = tf.convert_to_tensor(trainImages)
+	trainLabels = tf.convert_to_tensor(trainLabels)
+
 
 	#create queue
-	input_queue = tf.train.slice_input_producer([trainImages, trainLables], shuffle=True)
+	input_queue = tf.train.slice_input_producer([trainImages, trainLabels], shuffle=True)
 	image, label = get_data_from_disk(input_queue)
+
+	# apply random horizontal flip
+	choice = tf.random_uniform(shape=[1], minval=0, maxval=2, dtype=tf.int32)
+
+	image = tf.cond(tf.equal(tf.squeeze(choice), 0), lambda:tf.image.flip_left_right(image), lambda:image)
+	label = tf.cond(tf.equal(tf.squeeze(choice), 0), lambda:-label, lambda:label)
 
 	#cast image to float
 	image = tf.cast(image, tf.float32)
@@ -315,11 +362,17 @@ def read_data():
 	images, labels = tf.train.batch([yuv_image, label], batch_size=BATCH_SIZE,
 		num_threads=NUM_THREADS, capacity=MIN_QUEUE_SIZE + 3 * BATCH_SIZE)
 
+	# #shapes have to be defined for mini batch creation
+	# image.set_shape([256, 455, 3])
+	# label.set_shape([])
+	# #mini batch
+	# images, labels = tf.train.batch([image, label], batch_size=BATCH_SIZE,
+	# 	num_threads=NUM_THREADS, capacity=MIN_QUEUE_SIZE + 3 * BATCH_SIZE)
+
 	#crop image
 	images = tf.image.resize_bilinear(images, [66,200])
 
 	return images, labels
-
 
 
 def get_data_from_disk(queue):
