@@ -13,6 +13,9 @@ valY  = None
 testX  = None
 testY = None
 
+trainX_balanced=None
+trainY_balanced=None
+
 
 def preprocessing():
 	global trainX 
@@ -41,13 +44,16 @@ def preprocessing():
 		filenamesArray = np.array(filenames)
 		anglesArray = np.array(angles, dtype=np.float32)
 
+		#convert angles to radians
+		anglesArray = (anglesArray*np.pi)/180
+
 		#split data into 60% 20% 20%
-		trainX = filenamesArray[0: np.floor(filenamesArray.size *0.6).astype(int)]
-		valX = filenamesArray[np.floor(filenamesArray.size *0.6).astype(int): np.floor(filenamesArray.size *0.8).astype(int)]
+		trainX = filenamesArray[0: np.floor(filenamesArray.size *0.65).astype(int)]
+		valX = filenamesArray[np.floor(filenamesArray.size *0.65).astype(int): np.floor(filenamesArray.size *0.8).astype(int)]
 		testX = filenamesArray[np.floor(filenamesArray.size *0.8).astype(int): filenamesArray.size ]
 
-		trainY = anglesArray[0: np.floor(anglesArray.size *0.6).astype(int)]
-		valY = anglesArray[np.floor(anglesArray.size *0.6).astype(int): np.floor(anglesArray.size *0.8).astype(int)]
+		trainY = anglesArray[0: np.floor(anglesArray.size *0.65).astype(int)]
+		valY = anglesArray[np.floor(anglesArray.size *0.65).astype(int): np.floor(anglesArray.size *0.8).astype(int)]
 		testY = anglesArray[np.floor(anglesArray.size *0.8).astype(int): anglesArray.size ]
 
 		#for GPU handling
@@ -68,13 +74,13 @@ def preprocessing():
 		np.savetxt('test.txt',  test, fmt="%s")
 
 def generate_balance_dataset():
-	create_balance_dataset('train.txt')
-	plot_balance_dataset('../driving_dataset/train_balanced.csv')
+	create_balance_dataset('train.txt', 'train')
+	# plot_balance_dataset('../driving_dataset/train_balanced.csv')
 
 
 def plot_balance_dataset(file):
 	# temp = pd.read_csv('../driving_datas et/driving_log_balanced.csv',header=None, names=['image, steering'])
-	temp = pd.read_csv(file, sep=",",header=None, names=['image', 'steering'])
+	temp = pd.read_csv(file, sep=" ",header=None, names=['image', 'steering'])
 	temp.steering = temp.steering.astype(float)
 	# print(temp)
 
@@ -82,9 +88,9 @@ def plot_balance_dataset(file):
 	plt.title("Histogram with 1000 bins")
 	plt.show()
 
-def create_balance_dataset(file):
-	# data = pd.read_csv('../driving_dataset/data.txt', sep=" ", header = None, names=['image', 'steering'])
-	# print(data)
+def create_balance_dataset(file, mode):
+
+	global trainX_balanced, trainY_balanced
 
 	data = pd.read_csv(file, sep=" ", header = None, names=['image', 'steering'])
 
@@ -93,7 +99,7 @@ def create_balance_dataset(file):
 
 	balanced = pd.DataFrame()
 	bins = 1000
-	bin_n = 75
+	bin_n = 200
 	start = minVal
 
 	count = 1
@@ -106,8 +112,15 @@ def create_balance_dataset(file):
 			# print('count: ', count)
 			count += 1
 		start = end
-	balanced.to_csv('../driving_dataset/train_balanced.csv', index=False, header=False)
-		
+	balanced.to_csv('../driving_dataset/' +mode+'_balanced.csv', index=False, header=False, sep=" ")
+	
+	temp = balanced.as_matrix()
+
+	trainX_balanced = temp[:,0]
+	trainY_balanced = temp[:,1].astype(np.float32)
+
+	
+	
 
 def show_histrogram(data):
 
@@ -124,16 +137,27 @@ def show_histrogram(data):
 	plt.title("Histogram with " + str(bins)+" bins")
 	plt.show()
 
+def get_train():
+
+	global trainX_balanced
+	global trainY_balanced
+	if trainX_balanced is None and trainY_balanced is None:
+		preprocessing()
+		generate_balance_dataset()
+		
+	return  trainX_balanced, trainY_balanced
+
+
 
 def get_trainX():
 	global trainX
-	if  trainX is None:
+	if trainX is None:
 		preprocessing()
 	return  trainX
 
 def get_trainY():
 	global trainY
-	if  trainY is None:
+	if trainY is None:
 		preprocessing()
 	return  trainY
 
