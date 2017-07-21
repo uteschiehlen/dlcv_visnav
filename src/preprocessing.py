@@ -1,7 +1,9 @@
 from __future__ import with_statement
+from PIL import Image as pimg
 import numpy as np
 import  os
 import math
+import tensorflow as tf
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -15,6 +17,12 @@ testY = None
 
 trainX_balanced=None
 trainY_balanced=None
+
+NUM_THREADS = 16
+
+Y_MEAN =  0.473634918528
+U_MEAN = 0.0302694948176
+V_MEAN = -0.0508748753295
 
 
 def preprocessing():
@@ -148,18 +156,84 @@ def get_train():
 	return  trainX_balanced, trainY_balanced
 
 
-
-def get_trainX():
-	global trainX
-	if trainX is None:
+def get_val():
+	global valX
+	global valY
+	if valX is None or valY is None:
 		preprocessing()
-	return  trainX
+	return valX, valY
 
-def get_trainY():
-	global trainY
-	if trainY is None:
+def get_test():
+	global testX
+	global testY
+	if testX is None or testY is None:
 		preprocessing()
-	return  trainY
+	return testX, testY
+
+
+
+def read_data(inputImages, inputLabels, batch_size, num_samples, shuffle):
+	
+	#convert data to tensor
+	inputImages = tf.convert_to_tensor(inputImages)
+	inputLabels = tf.convert_to_tensor(inputLabels)
+
+
+	#create queue
+	input_queue = tf.train.slice_input_producer([inputImages, inputLabels], shuffle=shuffle)
+	image, label = get_data_from_disk(input_queue)
+
+	# apply random horizontal flip
+	choice = tf.random_uniform(shape=[1], minval=0, maxval=2, dtype=tf.int32)
+	if shuffle:
+		image = tf.cond(tf.equal(tf.squeeze(choice), 0), lambda:tf.image.flip_left_right(image), lambda:image)
+		label = tf.cond(tf.equal(tf.squeeze(choice), 0), lambda:-label, lambda:label)
+
+	#cast image to float
+	image = tf.cast(image, tf.float32)
+	label = tf.cast(label, tf.float32)
+
+	#normalization to [0,1]
+	image = image/255
+
+	#convert image from RGB to YUV
+	conv_matrix = [[0.299, 0.589, 0.114], [-0.14713, -0.28886, 0.436],[0.615, -0.51499, -0.10001]]
+
+
+	stacked_image = tf.reshape(image, [tf.shape(image)[0]*tf.shape(image)[1], tf.shape(image)[2]])
+	stacked_image = tf.transpose(stacked_image)
+	stacked_yuv = tf.matmul(conv_matrix, stacked_image)
+	stacked_yuv = tf.transpose(stacked_yuv)
+	yuv_image = tf.reshape(stacked_yuv, [tf.shape(image)[0], tf.shape(image)[1], tf.shape(image)[2]])
+
+	mean = tf.constant([Y_MEAN, U_MEAN, V_MEAN], dtype=tf.float32, shape=[1, 1, 3], name='yuv_mean')
+	yuv_image = yuv_image-mean
+
+	#shapes have to be defined for mini batch creation
+	yuv_image.set_shape([256, 455, 3])
+	label.set_shape([])
+	#mini batch
+	images, labels = tf.train.batch([yuv_image, label], batch_size=batch_size,
+		num_threads=NUM_THREADS, capacity=int(num_samples * 0.4) + 3 * batch_size)
+
+	#crop image
+	images = tf.image.resize_bilinear(images, [66,200])
+
+	return images, labels
+
+
+def get_data_from_disk(queue):
+	imageFile = queue[0]
+
+	# imageFile = "../driving_dataset/24.jpg"
+	content = tf.read_file(imageFile)
+	image = tf.image.decode_jpeg(content, channels=3)
+
+	label = queue[1]
+	# label = 11.7
+
+	return image, label
+
 
 
 def main():
