@@ -106,10 +106,10 @@ def validate():
 		# ckpt = tf.train.get_checkpoint_state('./weights/')
 
 
-		logging.basicConfig(filename='../log/validation.log',level=logging.INFO)
+		logging.basicConfig(filename='../log/validation4.log',level=logging.INFO)
 
 		accs = []
-		for i in range(131, 200):
+		for i in range(201):
 			accuracy = 0.0
 			saver.restore(session, '../weights/model' + str(i) + '.ckpt-' + str(i))
 
@@ -123,12 +123,12 @@ def validate():
 
 			accuracy = accuracy/NUM_BATCHES
 			accs.append(accuracy)
-			print('epoch ' + str(i) + ' accuracy: ', accuracy)
+			#print('epoch ' + str(i) + ' accuracy: ', accuracy)
 
 			content = datetime.now(), i, accuracy
 			logging.info(content)
 
-		print(np.argmax(accs), np.max(accs))
+		print(np.argmin(accs), np.min (accs))
 
 		#tensorflow threads 
 		coord.request_stop()

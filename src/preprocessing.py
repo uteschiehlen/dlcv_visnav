@@ -35,18 +35,24 @@ def preprocessing():
 	global testY 
 	filenames = []
 	angles = []
-	
+
 	#dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../driving_dataset/data.txt')
 	#fileh = open(dir)
 	#try:
 	with open('../driving_dataset/data.txt') as f:
 		content = f.readlines()
 		content= [x.split() for x in content]
-		
 		#read data from file		
 		for x in content:
-			filenames.append('../driving_dataset/' + x[0])
-			angles.append(x[1])
+			name = x[0]
+			num = name[:-4]
+			if num != '0':
+				# pad filenames with up to 8 zeros and frame_
+				num = num.zfill(8)
+				new_filename = 'frame_' + num + ".jpg"
+
+				filenames.append('../driving_dataset/' + new_filename)
+				angles.append(x[1])
 
 
 		filenamesArray = np.array(filenames)
@@ -83,16 +89,18 @@ def preprocessing():
 
 def generate_balance_dataset():
 	create_balance_dataset('train.txt', 'train')
-	# plot_balance_dataset('../driving_dataset/train_balanced.csv')
+	plot_balance_dataset('../driving_dataset/train_balanced.csv')
 
 
 def plot_balance_dataset(file):
+	minVal = 0.0
+	maxVal = 8.7577
 	# temp = pd.read_csv('../driving_datas et/driving_log_balanced.csv',header=None, names=['image, steering'])
 	temp = pd.read_csv(file, sep=" ",header=None, names=['image', 'steering'])
 	temp.steering = temp.steering.astype(float)
 	# print(temp)
 
-	plt.hist(np.absolute(temp.steering), bins=1000)  # arguments are passed to np.histogram
+	plt.hist(np.absolute(temp.steering), bins=1000, range=(minVal, maxVal))  # arguments are passed to np.histogram
 	plt.title("Histogram with 1000 bins")
 	plt.show()
 
@@ -101,9 +109,8 @@ def create_balance_dataset(file, mode):
 	global trainX_balanced, trainY_balanced
 
 	data = pd.read_csv(file, sep=" ", header = None, names=['image', 'steering'])
-
 	minVal = 0.0
-	maxVal = 501.78
+	maxVal = 8.7577
 
 	balanced = pd.DataFrame()
 	bins = 1000
@@ -114,7 +121,7 @@ def create_balance_dataset(file, mode):
 	for end in np.linspace(minVal, maxVal, num=bins):  
 		data_range = data[(np.absolute(data.steering) >= start) & (np.absolute(data.steering) < end)]
 		range_n = min(bin_n, data_range.shape[0])
-		
+
 		if range_n > 0 :
 			balanced = pd.concat([balanced, data_range.sample(range_n)])
 			# print('count: ', count)
@@ -123,7 +130,6 @@ def create_balance_dataset(file, mode):
 	balanced.to_csv('../driving_dataset/' +mode+'_balanced.csv', index=False, header=False, sep=" ")
 	
 	temp = balanced.as_matrix()
-
 	trainX_balanced = temp[:,0]
 	trainY_balanced = temp[:,1].astype(np.float32)
 
@@ -153,7 +159,7 @@ def get_train():
 		preprocessing()
 		generate_balance_dataset()
 		
-	return  trainX_balanced, trainY_balanced
+	return  trainX_balanced[:1295], trainY_balanced[:1295]
 
 
 def get_val():
@@ -222,6 +228,89 @@ def read_data(inputImages, inputLabels, batch_size, num_samples, shuffle):
 	return images, labels
 
 
+#returns combined image of rgb image and optical flow image
+def read_opt_data(inputImages, inputLabels, batch_size, num_samples, shuffle):
+	
+	#create optical flow filenames
+	inputImages_opt = []
+	for x in inputImages:
+		
+		name = 'optical_' + x[6:-4] + '.png'
+		inputImages_opt.append(name)  
+
+	#convert data to tensor
+	inputImages_opt = tf.convert_to_tensor(inputImages_opt)
+	inputImages = tf.convert_to_tensor(inputImages)
+	inputLabels = tf.convert_to_tensor(inputLabels)
+
+
+	#create queue
+	input_queue = tf.train.slice_input_producer([inputImages, inputImages_opt, inputLabels], shuffle=shuffle)
+	image, image_opt, label = get_opt_data_from_disk(input_queue)
+
+	# apply random horizontal flip
+	#choice = tf.random_uniform(shape=[1], minval=0, maxval=2, dtype=tf.int32)
+	#if shuffle:
+	#	image = tf.cond(tf.equal(tf.squeeze(choice), 0), lambda:tf.image.flip_left_right(image), lambda:image)
+	#	label = tf.cond(tf.equal(tf.squeeze(choice), 0), lambda:-label, lambda:label)
+
+	#cast image to float
+	image_opt = tf.cast(image_opt, tf.float32)
+	image = tf.cast(image, tf.float32)
+	label = tf.cast(label, tf.float32)
+
+	#normalization to [0,1]
+	image_opt = image_opt/255
+	image = image/255
+
+	#convert image from RGB to YUV
+	#only convert image, not the optical flow 
+	conv_matrix = [[0.299, 0.589, 0.114], [-0.14713, -0.28886, 0.436],[0.615, -0.51499, -0.10001]]
+
+
+	stacked_image = tf.reshape(image, [tf.shape(image)[0]*tf.shape(image)[1], tf.shape(image)[2]])
+	stacked_image = tf.transpose(stacked_image)
+	stacked_yuv = tf.matmul(conv_matrix, stacked_image)
+	stacked_yuv = tf.transpose(stacked_yuv)
+	yuv_image = tf.reshape(stacked_yuv, [tf.shape(image)[0], tf.shape(image)[1], tf.shape(image)[2]])
+
+	#TODO detirmine wether mean subtraction for optical flow is useful
+	mean = tf.constant([Y_MEAN, U_MEAN, V_MEAN], dtype=tf.float32, shape=[1, 1, 3], name='yuv_mean')
+	yuv_image = yuv_image-mean
+
+	#create combined image of the original and the optical flow, this results into 6 channels
+	combined_image = tf.concat([yuv_image, image_opt], 2)
+	
+	#shapes have to be defined for mini batch creation
+	combined_image.set_shape([256,455,6])
+	label.set_shape([])
+	
+	#mini batch
+	images, labels = tf.train.batch([combined_image, label], batch_size=batch_size,
+		num_threads=NUM_THREADS, capacity=int(num_samples * 0.4) + 3 * batch_size)
+
+	#crop image
+	images = tf.image.resize_bilinear(images, [66,200])
+
+	return images, labels
+
+
+def get_opt_data_from_disk(queue):
+	imageFile = queue[0]
+	imageFile_opt = queue[1]
+
+	# imageFile = "../driving_dataset/24.jpg"
+	content = tf.read_file(imageFile)
+	image = tf.image.decode_jpeg(content, channels=3)
+
+	content = tf.read_file(imageFile_opt)
+	image_opt = tf.image.decode_png(content, channels=3)
+
+	label = queue[2]
+	# label = 11.7
+
+	return image, image_opt, label
+
 def get_data_from_disk(queue):
 	imageFile = queue[0]
 
@@ -238,7 +327,18 @@ def get_data_from_disk(queue):
 
 def main():
 	preprocessing()
-	generate_balance_dataset()
+	#generate_balance_dataset()
+	
+	# images, labels = read_opt_data(im, la, 1, 12496, False)
+	# print(images.shape)
+	# session = tf.Session()
+	# for x in range(1):
+	# 	print('session')
+	# 	i_out, x_out = session.run(images,x)
+	# 	print('session end', x_out)
+	# 	print(i_out.shape)
+		
+
 
 if __name__ == "__main__":
 	main()

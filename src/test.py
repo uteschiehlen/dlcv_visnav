@@ -12,9 +12,9 @@ from datetime import datetime
 tf.logging.set_verbosity(tf.logging.INFO)
 
 # BATCH_SIZE = 44
-BATCH_SIZE = 38#239
+BATCH_SIZE = 9 #38#239
 NUM_THREADS = 16
-NUM_SAMPLES = 9082
+NUM_SAMPLES = 9081
 NUM_BATCHES = int(NUM_SAMPLES/BATCH_SIZE)
 MIN_QUEUE_SIZE = int(NUM_SAMPLES * 0.4)
 

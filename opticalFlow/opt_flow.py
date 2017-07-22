@@ -45,7 +45,9 @@ def draw_hsv(flow, count):
     hsv[...,0] = ang*(180/np.pi/2)
     hsv[...,1] = 255
     hsv[...,2] = np.minimum(v*4, 255)
+    # for open cv
     bgr = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+    # for deep learning
     rgb = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
 
     num = count.zfill(8)
@@ -55,7 +57,7 @@ def draw_hsv(flow, count):
     cv2.imwrite(new_filename,rgb)
     return bgr
 
-
+# used for glitch -> ignore
 def warp_flow(img, flow):
     h, w = flow.shape[:2]
     flow = -flow
@@ -73,17 +75,26 @@ if __name__ == '__main__':
         fn = 0
 
     cam = video.create_capture(fn)
+
+    # read in first image
     ret, prev = cam.read()
+    
+    #convert bgr to grayscale
     prevgray = cv2.cvtColor(prev, cv2.COLOR_BGR2GRAY)
     show_hsv = False
+
+    # ignore glitch
     show_glitch = False
     cur_glitch = prev.copy()
 
     count = 0
 
     while True:
+        # read in next image
         ret, img = cam.read()
+        # convert bgr to gray scale
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        # use input number from example code (dense not sparce)
         flow = cv2.calcOpticalFlowFarneback(prevgray, gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
         prevgray = gray
 
