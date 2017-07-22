@@ -20,7 +20,7 @@ import numpy as np
 import cv2
 import video
 
-count = None
+
 
 
 def draw_flow(img, flow, step=16):
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     show_glitch = False
     cur_glitch = prev.copy()
 
-    global count
+    count = 0
 
     while True:
         ret, img = cam.read()
