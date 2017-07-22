@@ -20,6 +20,8 @@ import numpy as np
 import cv2
 import video
 
+count = 0
+
 
 def draw_flow(img, flow, step=16):
     h, w = img.shape[:2]
@@ -34,7 +36,7 @@ def draw_flow(img, flow, step=16):
     return vis
 
 
-def draw_hsv(flow):
+def draw_hsv(flow, count):
     h, w = flow.shape[:2]
     fx, fy = flow[:,:,0], flow[:,:,1]
     ang = np.arctan2(fy, fx) + np.pi
@@ -44,6 +46,12 @@ def draw_hsv(flow):
     hsv[...,1] = 255
     hsv[...,2] = np.minimum(v*4, 255)
     bgr = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+    rgb = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
+
+    num = count.zfill(8)
+    new_filename = 'optical_' + num + ".png"
+
+    cv2.imwrite(new_filename,rgb)
     return bgr
 
 
@@ -70,6 +78,8 @@ if __name__ == '__main__':
     show_glitch = False
     cur_glitch = prev.copy()
 
+    global count
+
     while True:
         ret, img = cam.read()
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -77,8 +87,10 @@ if __name__ == '__main__':
         prevgray = gray
 
         cv2.imshow('flow', draw_flow(gray, flow))
+        cv2.imshow('flow HSV', draw_hsv(flow, count))
+
         if show_hsv:
-            cv2.imshow('flow HSV', draw_hsv(flow))
+            cv2.imshow('flow HSV', draw_hsv(flow,count))
         if show_glitch:
             cur_glitch = warp_flow(cur_glitch, flow)
             cv2.imshow('glitch', cur_glitch)
@@ -94,4 +106,5 @@ if __name__ == '__main__':
             if show_glitch:
                 cur_glitch = img.copy()
             print('glitch is', ['off', 'on'][show_glitch])
+        count += 1
     cv2.destroyAllWindows()
