@@ -1,0 +1,31 @@
+## Meeting Fr, 21.07.17
+
+1.Preprocessing
+- data augmentation of the training set by at random flipping it horizontally and negating the steering angle
+- balance the data set (it mainly consists of steering angles close to 0): only allow up to 200 images for each of the 1000 angle bins
+- convert angles to radiands for easier learning
+- divide the image channels by 255 for easier learning
+- subtract mean image of the whole training set from images
+
+2. Network changes
+- initialize weights of each layer with standard deviataion = number of input channels as proposed in a paper
+- set standard deviation of first layer to actual deviation (mean image deviation)
+- no batch normalization any more (not in NVIDIA paper)
+- keep track of moving average decay of variables and apply it to them
+- convert high level network (tf.layers) to low level network (tf.nn) for better debugging and understanding  
+
+3. Training
+- train network with learning rate 0.001
+-> convergence after 150 epochs to a loss of 5 (for better results use more complex network)
+-> convergence after 10 epochs to a loss of 5 when initializing the weights of all layers with the same standard deviation (reason is known optimal network structure)
+
+4. Validation
+- run network for all learned weight sets
+- find lowest loss between output and labels
+- result: 0.32176320072339504 rad ~ 18 deg
+
+5. Test
+- test the best weight set on the test data set
+
+6. Optical Flow
+

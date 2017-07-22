@@ -2,7 +2,6 @@ from __future__ import with_statement
 from PIL import Image as pimg
 import numpy as np
 import tensorflow as tf
-from tensorflow.contrib.learn.python.learn.estimators import model_fn as model_fn_lib
 import  os
 import preprocessing as pre
 import logging
@@ -25,11 +24,6 @@ NUM_EPOCHS_PER_DECAY = 300.0       	# Epochs after which learning rate decays.
 LEARNING_RATE_DECAY_FACTOR = 0.1   	# Learning rate decay factor.
 INITIAL_LEARNING_RATE = 0.001     	# Initial learning rate.
 
-Y_MEAN =  0.473634918528
-U_MEAN = 0.0302694948176
-V_MEAN = -0.0508748753295
-
-
 
 def train():
 	graph = tf.Graph()
@@ -37,7 +31,8 @@ def train():
 
 		global_step = tf.Variable(0, name='global_step', trainable=False)
 
-		images, labels = read_data()
+		im, la = pre.get_train()
+		images, labels = pre.read_data(im, la, BATCH_SIZE, NUM_SAMPLES, True)
 
 		# First convolutional layer 
 		W_conv1 = weight_variable('conv_weights_1', [5, 5, 3, 24], 0.01)
@@ -96,25 +91,13 @@ def train():
 		b_fc4 = bias_variable('fc_biases_4', [1])
 		h_fc4 = tf.matmul(h_fc3, W_fc4) + b_fc4
 
+		# radiants in the range of [-pi/2, pi/2] * 2 to get 360° range
 		y = tf.multiply(tf.atan(h_fc4), 2)
 
 		loss = loss_func(y, labels)
 
-		# #exponential learning rate decay
-		# global_step = tf.Variable(0, name='gloabal_step', trainable=False)
-		# decay_steps = int(NUM_BATCHES * NUM_EPOCHS_PER_DECAY)
-		# lr = tf.train.exponential_decay(INITIAL_LEARNING_RATE,
-		# 								global_step,
-		# 								decay_steps,
-		# 								LEARNING_RATE_DECAY_FACTOR,
-		# 								staircase=True)
-		# tf.summary.scalar('learning_rate', lr)
-
+		# training operator for session call
 		train_op, lr = optimize(loss, global_step)
-
-		#loss and gradient computation
-		# loss,train_op = loss_func(h_fc4, labels, global_step, lr)
-		# tf.summary.scalar('loss', loss)
 
 		# max_to_keep option to store all weights
 		saver = tf.train.Saver(tf.global_variables(), max_to_keep=None)
@@ -139,7 +122,7 @@ def train():
 		# ckpt = tf.train.get_checkpoint_state('./weights/')
 		# saver.restore(session, '/work/raymond/dlcv/dlcv_visnav/src/check_files/model99.ckpt-99')
 
-		logging.basicConfig(filename='/work/raymond/dlcv/dlcv_visnav/src/log/training.log',level=logging.INFO)
+		logging.basicConfig(filename='../log/training.log',level=logging.INFO)
 
 
 		for x in range(NUM_ITER):
@@ -206,7 +189,8 @@ def train():
 
 
 		
-		# train_writer.close()
+		train_writer.close()
+		
 		#tensorflow threads 
 		coord.request_stop()
 		coord.join(threads)
@@ -248,11 +232,12 @@ def optimize(total_loss, global_step):
 	loss_averages_op = _add_loss_summaries(total_loss)
 
 	# Compute gradients.
+	# control_dependencies is for the gpu to compute this first
 	with tf.control_dependencies([loss_averages_op]):
 		opt = tf.train.AdamOptimizer(lr)
 		grads = opt.compute_gradients(total_loss)
 
-	# Apply gradients.
+	# Apply gradients to variables w = w + g
 	apply_gradient_op = opt.apply_gradients(grads, global_step=global_step)
 
 	# Add histograms for trainable variables.
@@ -265,10 +250,12 @@ def optimize(total_loss, global_step):
 			tf.summary.histogram(var.op.name + '/gradients', grad)
 
 	# Track the moving averages of all trainable variables.
+	# speeds up convergence for more info got to documentation
 	variable_averages = tf.train.ExponentialMovingAverage(
 			MOVING_AVERAGE_DECAY, global_step)
 	variables_averages_op = variable_averages.apply(tf.trainable_variables())
 
+	# placeholder to finish computation of dependencies
 	with tf.control_dependencies([apply_gradient_op, variables_averages_op]):
 		train_op = tf.no_op(name='train')
 
@@ -286,6 +273,7 @@ def max_pool_2x2(x):
 
 def weight_variable(name, shape, stddev):
 	"""weight_variable generates a weight variable of a given shape."""
+	#1/sqrt(x)
 	initial = tf.truncated_normal_initializer(stddev=tf.rsqrt(stddev))
 	return _variable_with_weight_decay(name, shape, initial, wd=0.0004)
 
@@ -313,79 +301,6 @@ def _variable_with_weight_decay(name, shape, initializer, wd=None):
 		weight_decay = tf.multiply(tf.nn.l2_loss(var), wd, name='weight_loss')
 		tf.add_to_collection('losses', weight_decay)
 	return var
-
-
-
-
-
-def read_data():
-	#convert data to tensor
-	trainImages, trainLabels = pre.get_train()
-
-	trainImages = tf.convert_to_tensor(trainImages)
-	trainLabels = tf.convert_to_tensor(trainLabels)
-
-
-	#create queue
-	input_queue = tf.train.slice_input_producer([trainImages, trainLabels], shuffle=True)
-	image, label = get_data_from_disk(input_queue)
-
-	# apply random horizontal flip
-	choice = tf.random_uniform(shape=[1], minval=0, maxval=2, dtype=tf.int32)
-
-	image = tf.cond(tf.equal(tf.squeeze(choice), 0), lambda:tf.image.flip_left_right(image), lambda:image)
-	label = tf.cond(tf.equal(tf.squeeze(choice), 0), lambda:-label, lambda:label)
-
-	#cast image to float
-	image = tf.cast(image, tf.float32)
-	label = tf.cast(label, tf.float32)
-
-	image = image/255
-
-	#convert image from RGB to YUV
-	conv_matrix = [[0.299, 0.589, 0.114], [-0.14713, -0.28886, 0.436],[0.615, -0.51499, -0.10001]]
-
-
-	stacked_image = tf.reshape(image, [tf.shape(image)[0]*tf.shape(image)[1], tf.shape(image)[2]])
-	stacked_image = tf.transpose(stacked_image)
-	stacked_yuv = tf.matmul(conv_matrix, stacked_image)
-	stacked_yuv = tf.transpose(stacked_yuv)
-	yuv_image = tf.reshape(stacked_yuv, [tf.shape(image)[0], tf.shape(image)[1], tf.shape(image)[2]])
-
-	mean = tf.constant([Y_MEAN, U_MEAN, V_MEAN], dtype=tf.float32, shape=[1, 1, 3], name='yuv_mean')
-	yuv_image = yuv_image-mean
-
-	#shapes have to be defined for mini batch creation
-	yuv_image.set_shape([256, 455, 3])
-	label.set_shape([])
-	#mini batch
-	images, labels = tf.train.batch([yuv_image, label], batch_size=BATCH_SIZE,
-		num_threads=NUM_THREADS, capacity=MIN_QUEUE_SIZE + 3 * BATCH_SIZE)
-
-	# #shapes have to be defined for mini batch creation
-	# image.set_shape([256, 455, 3])
-	# label.set_shape([])
-	# #mini batch
-	# images, labels = tf.train.batch([image, label], batch_size=BATCH_SIZE,
-	# 	num_threads=NUM_THREADS, capacity=MIN_QUEUE_SIZE + 3 * BATCH_SIZE)
-
-	#crop image
-	images = tf.image.resize_bilinear(images, [66,200])
-
-	return images, labels
-
-
-def get_data_from_disk(queue):
-	imageFile = queue[0]
-
-	# imageFile = "../driving_dataset/24.jpg"
-	content = tf.read_file(imageFile)
-	image = tf.image.decode_jpeg(content, channels=3)
-
-	label = queue[1]
-	# label = 11.7
-
-	return image, label
 
 
 def main():
