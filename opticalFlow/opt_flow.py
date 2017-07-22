@@ -90,7 +90,7 @@ if __name__ == '__main__':
         # cv2.imshow('flow', draw_flow(gray, flow))
         # cv2.imshow('flow HSV', draw_hsv(flow, count))
 
-        draw_hsv(flow, count)
+        draw_hsv(flow, str(count))
 
         # if show_hsv:
         #     cv2.imshow('flow HSV', draw_hsv(flow,count))
