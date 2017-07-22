@@ -20,7 +20,7 @@ import numpy as np
 import cv2
 import video
 
-count = 0
+count = None
 
 
 def draw_flow(img, flow, step=16):
