@@ -50,6 +50,7 @@ def draw_hsv(flow, count):
 
     num = count.zfill(8)
     new_filename = 'optical_' + num + ".png"
+    print(new_filename)
 
     cv2.imwrite(new_filename,rgb)
     return bgr
@@ -86,25 +87,29 @@ if __name__ == '__main__':
         flow = cv2.calcOpticalFlowFarneback(prevgray, gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
         prevgray = gray
 
-        cv2.imshow('flow', draw_flow(gray, flow))
-        cv2.imshow('flow HSV', draw_hsv(flow, count))
+        # cv2.imshow('flow', draw_flow(gray, flow))
+        # cv2.imshow('flow HSV', draw_hsv(flow, count))
 
-        if show_hsv:
-            cv2.imshow('flow HSV', draw_hsv(flow,count))
-        if show_glitch:
-            cur_glitch = warp_flow(cur_glitch, flow)
-            cv2.imshow('glitch', cur_glitch)
+        draw_hsv(flow, count)
 
-        ch = cv2.waitKey(5)
-        if ch == 27:
-            break
-        if ch == ord('1'):
-            show_hsv = not show_hsv
-            print('HSV flow visualization is', ['off', 'on'][show_hsv])
-        if ch == ord('2'):
-            show_glitch = not show_glitch
-            if show_glitch:
-                cur_glitch = img.copy()
-            print('glitch is', ['off', 'on'][show_glitch])
+        # if show_hsv:
+        #     cv2.imshow('flow HSV', draw_hsv(flow,count))
+        # if show_glitch:
+        #     cur_glitch = warp_flow(cur_glitch, flow)
+        #     cv2.imshow('glitch', cur_glitch)
+
+        # ch = cv2.waitKey(5)
+        # if ch == 27:
+        #     break
+        # if ch == ord('1'):
+        #     show_hsv = not show_hsv
+        #     print('HSV flow visualization is', ['off', 'on'][show_hsv])
+        # if ch == ord('2'):
+        #     show_glitch = not show_glitch
+        #     if show_glitch:
+        #         cur_glitch = img.copy()
+        #     print('glitch is', ['off', 'on'][show_glitch])
         count += 1
-    cv2.destroyAllWindows()
+    # cv2.destroyAllWindows()
+
+    print(done)
