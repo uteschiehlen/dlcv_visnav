@@ -255,10 +255,11 @@ def read_opt_data(inputImages, inputLabels, batch_size, num_samples, shuffle):
 	image, image_opt, label = get_opt_data_from_disk(input_queue)
 
 	# apply random horizontal flip
-	#choice = tf.random_uniform(shape=[1], minval=0, maxval=2, dtype=tf.int32)
-	#if shuffle:
-	#	image = tf.cond(tf.equal(tf.squeeze(choice), 0), lambda:tf.image.flip_left_right(image), lambda:image)
-	#	label = tf.cond(tf.equal(tf.squeeze(choice), 0), lambda:-label, lambda:label)
+	choice = tf.random_uniform(shape=[1], minval=0, maxval=2, dtype=tf.int32)
+	if shuffle:
+		image_opt = tf.cond(tf.equal(tf.squeeze(choice), 0), lambda:tf.image.flip_left_right(image_opt), lambda:image_opt)
+		image = tf.cond(tf.equal(tf.squeeze(choice), 0), lambda:tf.image.flip_left_right(image), lambda:image)
+		label = tf.cond(tf.equal(tf.squeeze(choice), 0), lambda:-label, lambda:label)
 
 	#cast image to float
 	image_opt = tf.cast(image_opt, tf.float32)
