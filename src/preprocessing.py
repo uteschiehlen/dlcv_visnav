@@ -51,7 +51,7 @@ def preprocessing():
 				num = num.zfill(8)
 				new_filename = 'frame_' + num + ".jpg"
 
-				filenames.append('../driving_dataset/' + new_filename)
+				filenames.append('../driving_long_dataset/' + new_filename)
 				angles.append(x[1])
 
 
@@ -89,7 +89,7 @@ def preprocessing():
 
 def generate_balance_dataset():
 	create_balance_dataset('train.txt', 'train')
-	plot_balance_dataset('../driving_dataset/train_balanced.csv')
+	#plot_balance_dataset('../driving_dataset/train_balanced.csv')
 
 
 def plot_balance_dataset(file):
@@ -234,9 +234,15 @@ def read_opt_data(inputImages, inputLabels, batch_size, num_samples, shuffle):
 	#create optical flow filenames
 	inputImages_opt = []
 	for x in inputImages:
-		
-		name = 'optical_' + x[6:-4] + '.png'
+		name = '../opticalFlow_dataset/optical_' + x[30:-4] + '.png'
 		inputImages_opt.append(name)  
+
+	print('------------------------------------------------------------------------------------')
+	print(inputImages[0])
+	print(inputImages_opt[0])
+	print('------------------------------------------------------------------------------------')
+
+
 
 	#convert data to tensor
 	inputImages_opt = tf.convert_to_tensor(inputImages_opt)
@@ -285,6 +291,7 @@ def read_opt_data(inputImages, inputLabels, batch_size, num_samples, shuffle):
 	combined_image.set_shape([256,455,6])
 	label.set_shape([])
 	
+
 	#mini batch
 	images, labels = tf.train.batch([combined_image, label], batch_size=batch_size,
 		num_threads=NUM_THREADS, capacity=int(num_samples * 0.4) + 3 * batch_size)

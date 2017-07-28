@@ -12,7 +12,7 @@ tf.logging.set_verbosity(tf.logging.INFO)
 
 BATCH_SIZE = 85
 NUM_THREADS = 16
-NUM_SAMPLES = 12496-1 # first image does not have optical flow
+NUM_SAMPLES = 12495 # first image does not have optical flow
 NUM_BATCHES = int(NUM_SAMPLES/BATCH_SIZE)
 MIN_QUEUE_SIZE = int(NUM_SAMPLES * 0.4)
 NUM_ITER = 100000
@@ -30,10 +30,10 @@ def train():
 		global_step = tf.Variable(0, name='global_step', trainable=False)
 
 		im, la = pre.get_train()
-		images, labels = pre.read_data(im, la, BATCH_SIZE, NUM_SAMPLES, True)
+		images, labels = pre.read_opt_data(im, la, BATCH_SIZE, NUM_SAMPLES, True)
 
 		#split images into original and optical flow
-		images_ori, images_opt = tf.split(images, [3,3], 2)
+		images_ori, images_opt = tf.split(images, [3,3], 3)
 
 
 
@@ -96,7 +96,7 @@ def train():
 		b_fc4 = bias_variable('fc_biases_4', [1])
 		h_fc4 = tf.matmul(h_fc3, W_fc4) + b_fc4
 
-		# radiants in the range of [-pi/2, pi/2] * 2 to get 360° range
+		# radiants in the range of [-pi/2, pi/2] * 2 to get 360 range
 		y = tf.multiply(tf.atan(h_fc4), 2)
 
 
@@ -159,7 +159,7 @@ def train():
 		b_fc4_opt = bias_variable('fc_biases_4_opt', [1])
 		h_fc4_opt = tf.matmul(h_fc3_opt, W_fc4_opt) + b_fc4_opt
 
-		# radiants in the range of [-pi/2, pi/2] * 2 to get 360° range
+		# radiants in the range of [-pi/2, pi/2] * 2 to get 360 range
 		y_opt = tf.multiply(tf.atan(h_fc4_opt), 2)
 
 		#combined loss of original and optical flow
@@ -200,14 +200,14 @@ def train():
 			curr_learnRate = 0.0
 
 			for y in range(NUM_BATCHES):
-				#print("testing...")
+				print("testing...")
 				summary, train_out, lossVal, image_out, label_out, lr_out = session.run([merged, train_op, loss, images, labels, lr])
 				train_writer.add_summary(summary, x*NUM_ITER + y)
 				print('iteration: ', x)
 				print("learning_rate: ", lr_out)
 				print('loss: ', lossVal)
 
-				print(image_out.shape)
+				
 				# print(label_out)				
 
 
