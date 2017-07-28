@@ -1,0 +1,16 @@
+## Meeting Fr, 22.07.17
+
+1.Preprocessing
+- bug fix of create balanced data (radiants to degree conversion)
+- bug fix of show histogram, bins are now the same as the bins used to create the data
+- create new trainX.txt with "frame_" and 0 padded names
+- read opitcal data from disc that correspond to the original image given
+- stack original image and opitcal flow image together to create mini batches
+- delete 0.jpg image from considered data, because for the first image there is no optical flow
+
+2. Optical Flow Network
+- build second branch of the network, with optical flow image as input
+- adapt loss function to take both branches into account
+
+3. Test 
+- not possible becaus atcremers server are not reachable 
