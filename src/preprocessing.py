@@ -161,6 +161,15 @@ def get_train():
 		
 	return  trainX_balanced[:1295], trainY_balanced[:1295]
 
+def get_full_train():
+
+	global trainX
+	global trainY
+	if trainX is None and trainY is None:
+		preprocessing()
+		
+	return  trainX, trainY
+
 
 def get_val():
 	global valX
