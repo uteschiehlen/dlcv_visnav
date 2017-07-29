@@ -7,6 +7,7 @@ import preprocessing as pre
 import logging
 import time
 from datetime import datetime
+from tensorflow.contrib import rnn
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -21,6 +22,12 @@ MOVING_AVERAGE_DECAY = 0.9999
 NUM_EPOCHS_PER_DECAY = 300.0       	# Epochs after which learning rate decays.
 LEARNING_RATE_DECAY_FACTOR = 0.1   	# Learning rate decay factor.
 INITIAL_LEARNING_RATE = 0.001     	# Initial learning rate.
+
+N_STEPS = 32
+N_INPUT = 72
+N_HIDDEN = 128
+
+
 
 
 def train():
@@ -135,66 +142,25 @@ def train():
 		b_conv5_opt = bias_variable('conv_biases_5_opt', [64])
 		h_conv5_opt = tf.nn.relu(conv2d(h_conv4_opt, W_conv5_opt) + b_conv5_opt)
 
-		#stack result into one dimensional vector by using -1 option
-		#conv_flat_opt = tf.reshape(h_conv5_opt, [BATCH_SIZE, -1]) 
-
 		#concat the convolution results and flatten them
 		combined = tf.concat([h_conv5, h_conv5_opt], 3)
-		combined_flat = tf.reshape(combined, [BATCH_SIZE, -1])
-		combined_flat = tf.reshape(combined_flat, [BATCH_SIZE,  tf.shape(combined_flat)[1], 1])
 
+		pred = RNN(combined)
 
-		inputs = tf.unstack(combined_flat, axis = 0)
-		rnn_cell = tf.contrib.rnn.BasicLSTMCell(128)
-		outputs, state = tf.contrib.rnn.static_rnn(rnn_cell, inputs, dtype=tf.float32)
+		loss = loss_func(pred, labels)
 
-		#rnn_weight = weight_variable('rnn_weight', [1*18*64*2*128, 1164], 1164.0)
-		#rnn_bias = bias_variable('rnn_bias', [1164])
-		#relu_rnn = tf.nn.relu(tf.matmul(outputs[-1], rnn_weight) + rnn_bias)
+		# training operator for session call
+		train_op, lr = optimize(loss, global_step)
 
-		outputs = outputs[-1]
-
-
-
-
-		# # Fully connected layer 1
-		# W_fc1_opt = weight_variable('fc_weights_1_opt', [1 * 18 * 64, 1164], 1164.0)
-		# b_fc1_opt = bias_variable('fc_biases_1_opt', [1164])
-		# h_fc1_opt = tf.nn.relu(tf.matmul(conv_flat_opt, W_fc1_opt) + b_fc1_opt)
-
-		# # Fully connected layer 2
-		# W_fc2_opt = weight_variable('fc_weights_2_opt', [1164, 100], 100.0)
-		# b_fc2_opt = bias_variable('fc_biases_2_opt', [100])
-		# h_fc2_opt = tf.nn.relu(tf.matmul(h_fc1_opt, W_fc2_opt) + b_fc2_opt)
-
-		# # Fully connected layer 3
-		# W_fc3_opt = weight_variable('fc_weights_3_opt', [100, 10], 10.0)
-		# b_fc3_opt = bias_variable('fc_biases_3_opt', [10])
-		# h_fc3_opt = tf.nn.relu(tf.matmul(h_fc2_opt, W_fc3_opt) + b_fc3_opt)
-
-		# # Fully connected layer 4
-		# W_fc4_opt = weight_variable('fc_weights_4_opt', [10, 1], 1.0)
-		# b_fc4_opt = bias_variable('fc_biases_4_opt', [1])
-		# h_fc4_opt = tf.matmul(h_fc3_opt, W_fc4_opt) + b_fc4_opt
-
-		# # radiants in the range of [-pi/2, pi/2] * 2 to get 360 range
-		# y_opt = tf.multiply(tf.atan(h_fc4_opt), 2)
-
-		# #combined loss of original and optical flow
-		# loss = loss_func(y, y_opt, labels)
-
-		# # training operator for session call
-		# train_op, lr = optimize(loss, global_step)
-
-		# # max_to_keep option to store all weights
-		# saver = tf.train.Saver(tf.global_variables(), max_to_keep=None)
+		# max_to_keep option to store all weights
+		saver = tf.train.Saver(tf.global_variables(), max_to_keep=None)
 
 		#tensorflow session 
 		session = tf.Session()
 
 		#tensorboard
 		merged = tf.summary.merge_all()
-		train_writer = tf.summary.FileWriter('train_opt', session.graph)
+		train_writer = tf.summary.FileWriter('train_lstm', session.graph)
 
 		#initialization of all variables
 		session.run(tf.global_variables_initializer())
@@ -209,7 +175,7 @@ def train():
 		# ckpt = tf.train.get_checkpoint_state('./weights/')
 		# saver.restore(session, '/work/raymond/dlcv/dlcv_visnav/src/check_files/model99.ckpt-99')
 
-		logging.basicConfig(filename='../log/training_opt.log',level=logging.INFO)
+		logging.basicConfig(filename='../log/training_lstm_v2.log',level=logging.INFO)
 
 
 		for x in range(NUM_ITER):
@@ -221,15 +187,14 @@ def train():
 				# print("testing...")
 				# summary, train_out, lossVal, image_out, label_out, lr_out = session.run([merged, train_op, loss, images, labels, lr])
 				# train_writer.add_summary(summary, x*NUM_ITER + y)
-				# print('iteration: ', x)
-				# print("learning_rate: ", lr_out)
-				# print('loss: ', lossVal)
+				
+				summary, train_out, lossVal, lr_out = session.run([merged, train_op, loss, lr])
 
-				out = session.run(outputs)
-				#print(len(out))
-				#print(out[0].shape)
-				print(out.shape)				
+				print('iteration: ', x)
+				print("learning_rate: ", lr_out)
+				print('loss: ', lossVal)
 
+	
 
 				# #test layers for output
 				#iout, lout = session.run([fc_5, labels])
@@ -254,20 +219,20 @@ def train():
 				#	break
 				# #---------		
 
-			# 	average_loss = average_loss+lossVal
-			# # 	#print("done")
-			# 	print('batch: ', y)
-			# 	#print(lossVal)
-			# # 	# print(image_out.shape)
-			# 	curr_learnRate = lr_out
+				average_loss = average_loss+lossVal
+			# 	#print("done")
+				print('batch: ', y)
+				#print(lossVal)
+			# 	# print(image_out.shape)
+				curr_learnRate = lr_out
 				
-			# # 	#break
+			# 	#break
 			
-			# average_loss = average_loss/NUM_BATCHES
-			# print("average_loss: ", average_loss)
+			average_loss = average_loss/NUM_BATCHES
+			print("average_loss: ", average_loss)
 			
 			# str1 = str(x)
-			# str2 = "check_files/opt_model"
+			# str2 = "check_files_lstm_v2/lstm_model"
 			# str3 = ".ckpt"
 			# str4 = str2 + str1 + str3
 
@@ -284,11 +249,8 @@ def train():
 		coord.request_stop()
 		coord.join(threads)
 
-def loss_func(logits, logits_opt, labels):
-	loss_ori = tf.reduce_mean(tf.squared_difference(logits, labels))
-	loss_opt = tf.reduce_mean(tf.squared_difference(logits_opt, labels))
-
-	loss = 0.5 * (loss_ori + loss_opt)
+def loss_func(logits, labels):
+	loss = tf.reduce_mean(tf.squared_difference(logits, labels))
 	
 	tf.add_to_collection('losses', loss)
 
@@ -353,6 +315,30 @@ def optimize(total_loss, global_step):
 		train_op = tf.no_op(name='train')
 
 	return train_op, lr
+
+def RNN(x):
+	batch_x = tf.reshape(x, [BATCH_SIZE, N_STEPS, N_INPUT])
+
+	# Unstack to get a list of 'n_steps' tensors of shape (batch_size, n_input)
+	x_unstack = tf.unstack(batch_x, N_STEPS, 1)
+
+	# Define a lstm cell with tensorflow
+	lstm_cell = rnn.BasicLSTMCell(N_HIDDEN, forget_bias=1.0)
+
+	# Get lstm cell output
+	outputs, states = rnn.static_rnn(lstm_cell, x_unstack, dtype=tf.float32)
+
+	W_fc1_opt = weight_variable('lstm_weights_1', [N_HIDDEN, 1], float(N_HIDDEN))
+	b_fc1_opt = bias_variable('lstm_bias_1', [1])
+
+	outputs = tf.matmul(outputs[-1], W_fc1_opt) + b_fc1_opt
+
+	# radiants in the range of [-pi/2, pi/2] * 2 to get 360 range
+	y_opt = tf.multiply(tf.atan(outputs), 2)
+
+
+	return y_opt
+
 
 def conv2d(x, W):
 	"""conv2d returns a 2d convolution layer with full stride."""
