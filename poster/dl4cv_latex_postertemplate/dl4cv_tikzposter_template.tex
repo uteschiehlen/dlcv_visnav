@@ -1,4 +1,4 @@
-\documentclass[25pt, a0paper, landscape]{tikzposter}
+\documentclass[25pt, a0paper, landscape, blockverticalspace=-15mm, colspace=15mm]{tikzposter}
 
 \tikzposterlatexaffectionproofoff
 \usepackage[utf8]{inputenc}
@@ -10,11 +10,14 @@
 \renewcommand\Affilfont{\Large} % set font for affiliations
 \usepackage{amsmath, amsfonts, amssymb}
 \usepackage{tikz}
+\usepackage{caption}
+\usetikzlibrary{matrix}
 \usepackage{pgfplots}
 % align columns of tikzposter; needs two compilations
 \usepackage[colalign]{column_aligned}
 
-
+\DeclareCaptionFormat{empty}{}
+\captionsetup{format=empty}
 
 % tikzposter meta settings
 \usetheme{Default}
@@ -83,7 +86,6 @@
 \author[1]{Ute Schiehlen}
 \author[1]{Natalie Reppekus}
 \author[1]{Raymond Chua}
-\author[1]{Areeb Kamran}
 
 \affil[1]{Technical University of Munich}
 
@@ -105,7 +107,7 @@
 \colorlet{innerblocktitlebgcolor}{TumBlue}
 \colorlet{notebgcolor}{TumBlue}
 \colorlet{notefgcolor}{white}
-
+\colorlet{innerblocktitlefgcolor}{TumBlue}
 
 
 % main document
@@ -114,36 +116,83 @@
 \maketitle
 
 \begin{columns}
-    \column{0.5}
+    \column{0.4}
     \block{Abstract}{
-    An important component in autonomous vehicles is visual navigation. We used an  ordered sequence of frames recorded at the front of the car to obtain the steering angle using an end to end approach. Based on these images, we also computed the optical flow over adjacent frames to get additional motion information as input to our network and added an LSTM cell after the convolutional layers. 
-    
-    End to end learning using {\em fully convolutional networks} (FCNs) has proven to be successful in many computer vision tasks such as Recognition\cite{DBLP:journals/corr/SermanetEZMFL13}, Object Detection\cite{DBLP:journals/corr/SermanetEZMFL13}, Localization\cite{DBLP:journals/corr/SermanetEZMFL13, conf/cvpr/OquabBLS15} and Semantic Segmentation \cite{DBLP:journals/pami/ShelhamerLD17}. One reason why end to end learning is so powerful is that it allows the network to learn the internal representation of the data using the provided training information.
-    
-    Our approach is based on the network proposed in Bojarski et al.\cite{DBLP:journals/corr/BojarskiTDFFGJM16} consisting of five convolutional and three fully connected layers using the human steering angle as training signal. As this model did not fully exploit the temporal information of image sequences, we extended this architecture by training an additional convolutional network with optical flow calculated from the original images as input and optimizing the combined loss. As this approach yielded good results, we trained a second network consisting of a  {\em Long-Short term memory} (LSTM) cell instead of the fully connected layers.
+    An important component in autonomous vehicles is visual navigation. We used a sequence of frames recorded at the front of the car to predict the steering angle using an end to end approach. 
+Our network is based on Bojarski et al.\cite{DBLP:journals/corr/BojarskiTDFFGJM16} which consists of five convolutional and three fully connected layers using the human steering angle as the training signal. As this model did not fully exploit the temporal information of image sequences, we extended this architecture by training an additional convolutional network with {\em optical flow} computed from the original images as input and optimizing over the combined loss. As this approach yielded good results, we trained a third network consisting of a {\em Long-Short term memory} (LSTM) cell to further exploit temporal information. We achieved an improvement of 0.12 in the Mean Squared Error in our approach compared to Nvidia?s model.
    }
    
     \block{Data Preprocessing}{
     	\innerblock{Images}{
-		\coloredbox[width=200pt]{\center RGB}
-		\coloredbox[width=200pt]{\center Random Horizontal Flip}
-		\coloredbox[width=200pt]{\center Normalize}
-		\coloredbox[width=200pt]{\center Convert to YUV}
-		\coloredbox[width=200pt]{\center Zero-Mean}
+		\begin{tikzfigure}			
+			\hbox{\hspace{-2mm} \includegraphics{images/preprocessingImg}}
+			%\includegraphics{images/preprocessingImg}
+   		\end{tikzfigure}
 	}
 	\innerblock{Labels}{
-	}	
+		\begin{tikzfigure}			
+			\hbox{\hspace{-2mm} \includegraphics{images/preprocessingLabel}}
+			%\includegraphics{images/preprocessingLabel}
+    		\end{tikzfigure}
+	}
     }
-    
+    \block{Training and Evaluation Loss}{
+    	\begin{tikzfigure}			
+		\vbox{\vspace{-10mm} \includegraphics[trim={0 0 0 5cm},clip,scale=0.45]{images/train_eval_v5}}
+    	\end{tikzfigure}
+    }
+    \block{Test Results}{
+    	\resizebox{\linewidth}{!}{
+	\hspace{-10mm}
+	\fontsize{4}{7.2}
+	\selectfont
+	\begin{tabular}{ c c c c }
+		Model & NVIDIA & CNN+OptF & CNN+OptF+LSTM \\
+ 		\hline
+		MSE & 0.1911 & 0.1910  & \textbf{0.072} \\
+	\end{tabular}}
 
-    \column{0.5}
-    \block{Second column first block}{Content in your block.}
-    \block{Bibliography}{
-    	{\small
+	The values above are in radians. Compared in Degrees: $0.19\text{ rad} \approx 11^\circ\text{C}$, $0.072\text{ rad} \approx 4^\circ\text{C}$.
+    } 
+    
+    \column{0.2}
+    \block{}{
+    	\begin{tikzfigure}			
+		\includegraphics[scale=1.2]{images/img5211}
+   	\end{tikzfigure}
+	\begin{tikzfigure}			
+		\includegraphics[scale=1.2]{images/opt5211}
+   	\end{tikzfigure}
+    }
+    \block{Loss Functions}{
+    	\begin{align*}
+	loss_{opt} &= \sum (y_{orig} - labels)^2 + (y_{opt} - labels)^2 \\
+	loss_{lstm} &= \sum (y - labels)^2 
+	\end{align*}}
+
+    \block{Our Approach}{
+    We converted RGB images into YUV color space, which encodes the human perception.We trained all networks using mini-batch Stochastic Gradient Descent with a learning rate of 0.001 over 200 epochs. For the Nvidia and CNN+Optical Flow network we consider a balanced subset of the training data in order to reduce the number of samples where the car is driving straight. However this was not applied to the LSTM model due to the requirement of having sequential images. In our experiments we have shown that the LSTM model converges faster during training and achieves a better performance for testing.
+     }
+    \block{References}{
+    	{\footnotesize
+		\nocite{*}
+		\renewcommand\refname{\vskip -1cm}
 		\bibliographystyle{abbrv}
 		\bibliography{bib}
 	}
     }
+    
+    \column{0.4}
+    \block{Architectures}{
+    	\begin{tikzfigure}			
+		\includegraphics[scale=2]{images/modelOpt}
+   	\end{tikzfigure}
+	\enspace
+	\begin{tikzfigure}			
+		\includegraphics[scale=0.8]{images/LSTM-4}
+   	\end{tikzfigure}
+    }
+    
 \end{columns}
 
 \end{document}

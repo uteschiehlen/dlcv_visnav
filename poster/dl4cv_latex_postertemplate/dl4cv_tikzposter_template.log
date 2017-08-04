@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2017.1.1)  3 AUG 2017 19:05
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2017.1.1)  4 AUG 2017 16:07
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1055,6 +1055,26 @@ LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (/usr/local/texlive/2016/texmf-dist/tex/latex/amsfonts/amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
 )
+(/usr/local/texlive/2016/texmf-dist/tex/latex/caption/caption.sty
+Package: caption 2016/02/21 v3.3-144 Customizing captions (AR)
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/caption/caption3.sty
+Package: caption3 2016/02/04 v1.7-139 caption3 kernel (AR)
+Package caption3 Info: TeX engine: e-TeX on input line 67.
+\captionmargin=\dimen310
+\captionmargin@=\dimen311
+\captionwidth=\dimen312
+\caption@tempdima=\dimen313
+\caption@indent=\dimen314
+\caption@parindent=\dimen315
+\caption@hangindent=\dimen316
+)
+\c@ContinuedFloat=\count134
+)
+(/usr/local/texlive/2016/texmf-dist/tex/generic/pgf/frontendlayer/tikz/librarie
+s/tikzlibrarymatrix.code.tex
+File: tikzlibrarymatrix.code.tex 2013/07/12 v3.0.1a (rcs-revision 1.4)
+)
 (/usr/local/texlive/2016/texmf-dist/tex/latex/pgfplots/pgfplots.sty
 (/usr/local/texlive/2016/texmf-dist/tex/generic/pgfplots/pgfplots.revision.tex)
 Package: pgfplots 2016/01/06 v1.13 Data Visualization (1.13)
@@ -1063,9 +1083,9 @@ Package: pgfplots 2016/01/06 v1.13 Data Visualization (1.13)
 \t@pgfplots@toka=\toks36
 \t@pgfplots@tokb=\toks37
 \t@pgfplots@tokc=\toks38
-\pgfplots@tmpa=\dimen310
-\c@pgfplots@coordindex=\count134
-\c@pgfplots@scanlineindex=\count135
+\pgfplots@tmpa=\dimen317
+\c@pgfplots@coordindex=\count135
+\c@pgfplots@scanlineindex=\count136
 
 (/usr/local/texlive/2016/texmf-dist/tex/generic/pgfplots/sys/pgfplotssysgeneric
 .code.tex))
@@ -1081,7 +1101,7 @@ Package pgfplots: loading complementary arithmetics for your pgf version...
 soldpgfsupp_pgflibraryfpu.code.tex)
 (/usr/local/texlive/2016/texmf-dist/tex/generic/pgfplots/oldpgfcompatib/pgfplot
 soldpgfsupp_pgfmathfloat.code.tex
-\c@pgfmathroundto@lastzeros=\count136
+\c@pgfmathroundto@lastzeros=\count137
 ))
 (/usr/local/texlive/2016/texmf-dist/tex/generic/pgfplots/util/pgfplotsutil.code
 .tex
@@ -1091,13 +1111,13 @@ liststructure.code.tex)
 liststructureext.code.tex)
 (/usr/local/texlive/2016/texmf-dist/tex/generic/pgfplots/liststructure/pgfplots
 array.code.tex
-\c@pgfplotsarray@tmp=\count137
+\c@pgfplotsarray@tmp=\count138
 )
 (/usr/local/texlive/2016/texmf-dist/tex/generic/pgfplots/liststructure/pgfplots
 matrix.code.tex)
 (/usr/local/texlive/2016/texmf-dist/tex/generic/pgfplots/numtable/pgfplotstable
 shared.code.tex
-\c@pgfplotstable@counta=\count138
+\c@pgfplotstable@counta=\count139
 \t@pgfplotstable@a=\toks39
 )
 (/usr/local/texlive/2016/texmf-dist/tex/generic/pgfplots/liststructure/pgfplots
@@ -1110,7 +1130,7 @@ ta.code.tex))
 .code.tex)
 (/usr/local/texlive/2016/texmf-dist/tex/generic/pgfplots/libs/pgflibrarypgfplot
 s.surfshading.code.tex
-\c@pgfplotslibrarysurf@no=\count139
+\c@pgfplotslibrarysurf@no=\count140
 
 (/usr/local/texlive/2016/texmf-dist/tex/generic/pgfplots/sys/pgflibrarypgfplots
 .surfshading.pgfsys-pdftex.def)))
@@ -1142,13 +1162,13 @@ x)
 s/tikzlibrarydecorations.pathreplacing.code.tex
 (/usr/local/texlive/2016/texmf-dist/tex/generic/pgf/libraries/decorations/pgfli
 brarydecorations.pathreplacing.code.tex))
-\pgfplots@numplots=\count140
-\pgfplots@xmin@reg=\dimen311
-\pgfplots@xmax@reg=\dimen312
-\pgfplots@ymin@reg=\dimen313
-\pgfplots@ymax@reg=\dimen314
-\pgfplots@zmin@reg=\dimen315
-\pgfplots@zmax@reg=\dimen316
+\pgfplots@numplots=\count141
+\pgfplots@xmin@reg=\dimen318
+\pgfplots@xmax@reg=\dimen319
+\pgfplots@ymin@reg=\dimen320
+\pgfplots@ymax@reg=\dimen321
+\pgfplots@zmin@reg=\dimen322
+\pgfplots@zmax@reg=\dimen323
 )
 (/usr/local/texlive/2016/texmf-dist/tex/generic/pgf/frontendlayer/tikz/librarie
 s/tikzlibraryplotmarks.code.tex
@@ -1161,45 +1181,45 @@ File: pgflibraryplotmarks.code.tex 2015/08/03 v3.0.1a (rcs-revision 1.14)
 (/usr/local/texlive/2016/texmf-dist/tex/latex/oberdiek/letltxmacro.sty
 Package: letltxmacro 2016/05/16 v1.5 Let assignment for LaTeX macros (HO)
 )
-\c@my@column=\count141
-\c@my@column@loop=\count142
-\c@my@block=\count143
-\my@columnextraspace=\dimen317
-\my@maxcolheight=\dimen318
-\my@colheight=\dimen319
-\my@blocktopstart=\dimen320
-\my@rounded=\dimen321
+\c@my@column=\count142
+\c@my@column@loop=\count143
+\c@my@block=\count144
+\my@columnextraspace=\dimen324
+\my@maxcolheight=\dimen325
+\my@colheight=\dimen326
+\my@blocktopstart=\dimen327
+\my@rounded=\dimen328
 )
 \LogoSep=\skip51
 
 (./dl4cv_tikzposter_template.aux)
 \openout1 = `dl4cv_tikzposter_template.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 114.
+LaTeX Font Info:    ... okay on input line 114.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 114.
+LaTeX Font Info:    ... okay on input line 114.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 114.
+LaTeX Font Info:    ... okay on input line 114.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 114.
+LaTeX Font Info:    ... okay on input line 114.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 114.
+LaTeX Font Info:    ... okay on input line 114.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 114.
+LaTeX Font Info:    ... okay on input line 114.
  ABD: EveryShipout initializing macros
 (/usr/local/texlive/2016/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count144
-\scratchdimen=\dimen322
+\scratchcounter=\count145
+\scratchdimen=\dimen329
 \scratchbox=\box72
-\nofMPsegments=\count145
-\nofMParguments=\count146
+\nofMPsegments=\count146
+\nofMParguments=\count147
 \everyMPshowfont=\toks40
-\MPscratchCnt=\count147
-\MPscratchDim=\dimen323
-\MPnumerator=\count148
-\makeMPintoPDFobject=\count149
+\MPscratchCnt=\count148
+\MPscratchDim=\dimen330
+\MPnumerator=\count149
+\makeMPintoPDFobject=\count150
 \everyMPtoPDFconversion=\toks41
 ) (/usr/local/texlive/2016/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
 Package: pdftexcmds 2016/05/10 v0.21 Utility functions of pdfTeX for LuaTeX (HO
@@ -1279,20 +1299,22 @@ e
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: End \AtBeginDocument code.
 
 Package pgfplots Warning: running in backwards compatibility mode (unsuitable t
 ick labels; missing features). Consider writing \pgfplotsset{compat=1.13} into 
 your preamble.
- on input line 112.
+ on input line 114.
 
 Missing character: There is no 1 in font nullfont!
 Missing character: There is no = in font nullfont!
 Missing character: There is no 1 in font nullfont!
-LaTeX Font Info:    Try loading font information for U+msa on input line 115.
+LaTeX Font Info:    Try loading font information for U+msa on input line 117.
 (/usr/local/texlive/2016/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 115.
+LaTeX Font Info:    Try loading font information for U+msb on input line 117.
 
 (/usr/local/texlive/2016/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
@@ -1300,60 +1322,156 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 <tum_logo.pdf, id=29, 742.775pt x 391.4625pt>
 File: tum_logo.pdf Graphic file (type pdf)
  <use tum_logo.pdf>
-Package pdftex.def Info: tum_logo.pdf used on input line 115.
+Package pdftex.def Info: tum_logo.pdf used on input line 117.
 (pdftex.def)             Requested size: 426.79134pt x 224.93387pt.
 File: tum_logo.pdf Graphic file (type pdf)
 
 <use tum_logo.pdf>
-Package pdftex.def Info: tum_logo.pdf used on input line 115.
+Package pdftex.def Info: tum_logo.pdf used on input line 117.
 (pdftex.def)             Requested size: 426.79134pt x 224.93387pt.
 
+<images/preprocessingImg.pdf, id=30, 763.85374pt x 62.2325pt>
+File: images/preprocessingImg.pdf Graphic file (type pdf)
 
-LaTeX Warning: Citation `DBLP:journals/corr/BojarskiTDFFGJM16' on page 1 undefi
-ned on input line 124.
+<use images/preprocessingImg.pdf>
+Package pdftex.def Info: images/preprocessingImg.pdf used on input line 138.
+(pdftex.def)             Requested size: 763.85187pt x 62.23235pt.
 
-
-Overfull \hbox (4.66786pt too wide) in paragraph at lines 136--136
+Overfull \hbox (4.66788pt too wide) in paragraph at lines 138--138
 [][] 
  []
 
+<images/preprocessingLabel.pdf, id=31, 282.05376pt x 62.2325pt>
+File: images/preprocessingLabel.pdf Graphic file (type pdf)
 
-Overfull \hbox (4.66786pt too wide) in paragraph at lines 136--136
+<use images/preprocessingLabel.pdf>
+Package pdftex.def Info: images/preprocessingLabel.pdf used on input line 138.
+(pdftex.def)             Requested size: 282.05305pt x 62.23235pt.
+
+Overfull \hbox (4.66788pt too wide) in paragraph at lines 138--138
 [][] 
  []
 
-\my@colheighta=\dimen324
+<images/train_eval_v5.png, id=32, 1633.302pt x 1316.7594pt>
+File: images/train_eval_v5.png Graphic file (type png)
+
+<use images/train_eval_v5.png>
+Package pdftex.def Info: images/train_eval_v5.png used on input line 143.
+(pdftex.def)             Requested size: 734.97913pt x 528.51814pt.
+LaTeX Font Info:    Calculating math sizes for size <4> on input line 156.
+
+
+LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <4> not available
+(Font)              size <5> substituted on input line 156.
+
+
+LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <2.79999> not available
+(Font)              size <5> substituted on input line 156.
+
+
+LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <2> not available
+(Font)              size <5> substituted on input line 156.
+
+
+LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <4> not available
+(Font)              size <5> substituted on input line 156.
+
+
+LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <2.79999> not available
+(Font)              size <5> substituted on input line 156.
+
+
+LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <2> not available
+(Font)              size <5> substituted on input line 156.
+
+
+LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <4> not available
+(Font)              size <5> substituted on input line 156.
+
+
+LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <2.79999> not available
+(Font)              size <5> substituted on input line 156.
+
+
+LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <2> not available
+(Font)              size <5> substituted on input line 156.
+
+\my@colheighta=\dimen331
+<images/img5211.jpg, id=35, 456.70625pt x 256.96pt>
+File: images/img5211.jpg Graphic file (type jpg)
+ <use images/img5211.jpg>
+Package pdftex.def Info: images/img5211.jpg used on input line 166.
+(pdftex.def)             Requested size: 548.04475pt x 308.35045pt.
+
+<images/opt5211.png, id=36, 456.70625pt x 256.96pt>
+File: images/opt5211.png Graphic file (type png)
+ <use images/opt5211.png>
+Package pdftex.def Info: images/opt5211.png used on input line 166.
+(pdftex.def)             Requested size: 548.04475pt x 308.35045pt.
+
+Overfull \hbox (22.48135pt too wide) in paragraph at lines 171--171
+[] 
+ []
+
+
+Overfull \hbox (22.48135pt too wide) in paragraph at lines 171--171
+[][][][][]  
+ []
+
 (./dl4cv_tikzposter_template.bbl)
-\my@colheightb=\dimen325
-\my@maxcolheight=\dimen326
-\my@colheight@loop=\dimen327
+\my@colheightb=\dimen332
+
+<images/modelOpt.pdf, id=37, 599.23875pt x 641.39626pt>
+File: images/modelOpt.pdf Graphic file (type pdf)
+
+<use images/modelOpt.pdf>
+Package pdftex.def Info: images/modelOpt.pdf used on input line 194.
+(pdftex.def)             Requested size: 1198.47458pt x 1282.78937pt.
+ <images/LSTM-4.pdf, id=38, 1373.13pt x 565.11125pt>
+File: images/LSTM-4.pdf Graphic file (type pdf)
+
+<use images/LSTM-4.pdf>
+Package pdftex.def Info: images/LSTM-4.pdf used on input line 194.
+(pdftex.def)             Requested size: 1098.50551pt x 452.08961pt.
+\my@colheightc=\dimen333
+\my@maxcolheight=\dimen334
+\my@colheight@loop=\dimen335
  [1
 
-{/usr/local/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./tum_l
-ogo.pdf>] (./dl4cv_tikzposter_template.aux)
+{/usr/local/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./image
+s/train_eval_v5.png> <./tum_logo.pdf> <./images/preprocessingImg.pdf> <./images
+/preprocessingLabel.pdf> <./images/img5211.jpg> <./images/opt5211.png (PNG copy
+)> <./images/modelOpt.pdf> <./images/LSTM-4.pdf>]
+(./dl4cv_tikzposter_template.aux)
 
-LaTeX Warning: There were undefined references.
+LaTeX Font Warning: Size substitutions with differences
+(Font)              up to 3.0pt have occurred.
 
 
 LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
  ) 
 Here is how much of TeX's memory you used:
- 27050 strings out of 493014
- 685116 string characters out of 6133352
- 920601 words of memory out of 5000000
- 30016 multiletter control sequences out of 15000+600000
- 52587 words of font info for 113 fonts, out of 8000000 for 9000
+ 28205 strings out of 493014
+ 706266 string characters out of 6133352
+ 947525 words of memory out of 5000000
+ 31142 multiletter control sequences out of 15000+600000
+ 62064 words of font info for 131 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 62i,14n,84p,808b,1603s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 62i,12n,92p,808b,1358s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb
-></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb
-></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb><
-/usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on dl4cv_tikzposter_template.pdf (1 page, 66386 bytes).
+></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx5.pfb><
+/usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb><
+/usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></
+usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></u
+sr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr
+/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/lo
+cal/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/loc
+al/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb>
+Output written on dl4cv_tikzposter_template.pdf (1 page, 785052 bytes).
 PDF statistics:
- 57 PDF objects out of 1000 (max. 8388607)
- 32 compressed objects within 1 object stream
+ 100 PDF objects out of 1000 (max. 8388607)
+ 61 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 114 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 155 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -1,21 +1,21 @@
 \begin{thebibliography}{1}
 
-\bibitem{conf/cvpr/OquabBLS15}
-M.~Oquab, L.~Bottou, I.~Laptev, and J.~Sivic.
-\newblock Is object localization for free? - weakly-supervised learning with
-  convolutional neural networks.
-\newblock In {\em CVPR}, pages 685--694. IEEE Computer Society, 2015.
+\bibitem{DBLP:journals/corr/BojarskiTDFFGJM16}
+M.~Bojarski, D.~D. Testa, D.~Dworakowski, B.~Firner, B.~Flepp, P.~Goyal, L.~D.
+  Jackel, M.~Monfort, U.~Muller, J.~Zhang, X.~Zhang, J.~Zhao, and K.~Zieba.
+\newblock End to end learning for self-driving cars.
+\newblock {\em CoRR}, abs/1604.07316, 2016.
 
-\bibitem{DBLP:journals/corr/SermanetEZMFL13}
-P.~Sermanet, D.~Eigen, X.~Zhang, M.~Mathieu, R.~Fergus, and Y.~LeCun.
-\newblock Overfeat: Integrated recognition, localization and detection using
-  convolutional networks.
-\newblock {\em CoRR}, abs/1312.6229, 2013.
+\bibitem{DBLP:journals/neco/HochreiterS97}
+S.~Hochreiter and J.~Schmidhuber.
+\newblock Long short-term memory.
+\newblock {\em Neural Computation}, 9(8):1735--1780, 1997.
 
-\bibitem{DBLP:journals/pami/ShelhamerLD17}
-E.~Shelhamer, J.~Long, and T.~Darrell.
-\newblock Fully convolutional networks for semantic segmentation.
-\newblock {\em {IEEE} Trans. Pattern Anal. Mach. Intell.}, 39(4):640--651,
-  2017.
+\bibitem{DBLP:conf/nips/SimonyanZ14}
+K.~Simonyan and A.~Zisserman.
+\newblock Two-stream convolutional networks for action recognition in videos.
+\newblock In {\em Advances in Neural Information Processing Systems 27: Annual
+  Conference on Neural Information Processing Systems 2014, December 8-13 2014,
+  Montreal, Quebec, Canada}, pages 568--576, 2014.
 
 \end{thebibliography}

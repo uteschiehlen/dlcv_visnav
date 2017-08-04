@@ -3,48 +3,52 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: dl4cv_tikzposter_template.aux
 The style file: abbrv.bst
 Database file #1: bib.bib
-A bad cross reference---entry "conf/cvpr/OquabBLS15"
-refers to entry "conf/cvpr/2015", which doesn't exist
-Warning--I didn't find a database entry for "conf/cvpr/2015"
+Illegal end of database file---line 55 of file bib.bib
+ : 
+ : 
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+A bad cross reference---entry "DBLP:conf/nips/SimonyanZ14"
+refers to entry "DBLP:conf/nips/2014", which doesn't exist
 You've used 3 entries,
             2118 wiz_defined-function locations,
-            521 strings with 4499 characters,
-and the built_in function-call counts, 1269 in all, are:
-= -- 122
-> -- 74
+            521 strings with 4619 characters,
+and the built_in function-call counts, 1407 in all, are:
+= -- 130
+> -- 94
 < -- 1
-+ -- 29
-- -- 26
-* -- 96
-:= -- 215
-add.period$ -- 10
++ -- 37
+- -- 34
+* -- 112
+:= -- 239
+add.period$ -- 9
 call.type$ -- 3
-change.case$ -- 22
+change.case$ -- 26
 chr.to.int$ -- 0
 cite$ -- 3
 duplicate$ -- 44
-empty$ -- 86
-format.name$ -- 26
-if$ -- 264
+empty$ -- 88
+format.name$ -- 34
+if$ -- 283
 int.to.chr$ -- 0
 int.to.str$ -- 3
 missing$ -- 3
 newline$ -- 18
 num.names$ -- 6
-pop$ -- 20
+pop$ -- 25
 preamble$ -- 1
-purify$ -- 19
+purify$ -- 23
 quote$ -- 0
-skip$ -- 34
+skip$ -- 37
 stack$ -- 0
-substring$ -- 68
+substring$ -- 78
 swap$ -- 13
 text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 12
 warning$ -- 0
-while$ -- 10
+while$ -- 11
 width$ -- 4
-write$ -- 36
-(There was 1 error message)
+write$ -- 35
+(There were 2 error messages)
