@@ -1,0 +1,21 @@
+\begin{thebibliography}{1}
+
+\bibitem{conf/cvpr/OquabBLS15}
+M.~Oquab, L.~Bottou, I.~Laptev, and J.~Sivic.
+\newblock Is object localization for free? - weakly-supervised learning with
+  convolutional neural networks.
+\newblock In {\em CVPR}, pages 685--694. IEEE Computer Society, 2015.
+
+\bibitem{DBLP:journals/corr/SermanetEZMFL13}
+P.~Sermanet, D.~Eigen, X.~Zhang, M.~Mathieu, R.~Fergus, and Y.~LeCun.
+\newblock Overfeat: Integrated recognition, localization and detection using
+  convolutional networks.
+\newblock {\em CoRR}, abs/1312.6229, 2013.
+
+\bibitem{DBLP:journals/pami/ShelhamerLD17}
+E.~Shelhamer, J.~Long, and T.~Darrell.
+\newblock Fully convolutional networks for semantic segmentation.
+\newblock {\em {IEEE} Trans. Pattern Anal. Mach. Intell.}, 39(4):640--651,
+  2017.
+
+\end{thebibliography}
