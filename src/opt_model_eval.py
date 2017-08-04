@@ -7,27 +7,20 @@ import preprocessing as pre
 import logging
 import time
 from datetime import datetime
-from tensorflow.contrib import rnn
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
-BATCH_SIZE = 45
+BATCH_SIZE = 49
 NUM_THREADS = 16
-NUM_SAMPLES = 45405
+NUM_SAMPLES = 6811 # first image does not have optical flow
 NUM_BATCHES = int(NUM_SAMPLES/BATCH_SIZE)
 MIN_QUEUE_SIZE = int(NUM_SAMPLES * 0.4)
-NUM_ITER = 100000
+NUM_ITER = 201
 
 MOVING_AVERAGE_DECAY = 0.9999
 NUM_EPOCHS_PER_DECAY = 300.0       	# Epochs after which learning rate decays.
 LEARNING_RATE_DECAY_FACTOR = 0.1   	# Learning rate decay factor.
 INITIAL_LEARNING_RATE = 0.001     	# Initial learning rate.
-
-N_STEPS = 32
-N_INPUT = 72
-N_HIDDEN = 128
-
-
 
 
 def train():
@@ -36,11 +29,12 @@ def train():
 
 		global_step = tf.Variable(0, name='global_step', trainable=False)
 
-		im, la = pre.get_full_train()
-		images, labels = pre.read_opt_data(im, la, BATCH_SIZE, NUM_SAMPLES, False)
+		im, la = pre.get_val()
+		images, labels = pre.read_opt_data(im, la, BATCH_SIZE, NUM_SAMPLES, True)
 
 		#split images into original and optical flow
 		images_ori, images_opt = tf.split(images, [3,3], 3)
+
 
 
 		#---------------NVIDIA----------------------
@@ -80,30 +74,30 @@ def train():
 		h_conv5 = tf.nn.relu(conv2d(h_conv4, W_conv5) + b_conv5)
 
 		#stack result into one dimensional vector by using -1 option
-		#conv_flat = tf.reshape(h_conv5, [BATCH_SIZE, -1]) 
+		conv_flat = tf.reshape(h_conv5, [BATCH_SIZE, -1]) 
 
-		# # Fully connected layer 1
-		# W_fc1 = weight_variable('fc_weights_1', [1 * 18 * 64, 1164], 1164.0)
-		# b_fc1 = bias_variable('fc_biases_1', [1164])
-		# h_fc1 = tf.nn.relu(tf.matmul(conv_flat, W_fc1) + b_fc1)
+		# Fully connected layer 1
+		W_fc1 = weight_variable('fc_weights_1', [1 * 18 * 64, 1164], 1164.0)
+		b_fc1 = bias_variable('fc_biases_1', [1164])
+		h_fc1 = tf.nn.relu(tf.matmul(conv_flat, W_fc1) + b_fc1)
 
-		# # Fully connected layer 2
-		# W_fc2 = weight_variable('fc_weights_2', [1164, 100], 100.0)
-		# b_fc2 = bias_variable('fc_biases_2', [100])
-		# h_fc2 = tf.nn.relu(tf.matmul(h_fc1, W_fc2) + b_fc2)
+		# Fully connected layer 2
+		W_fc2 = weight_variable('fc_weights_2', [1164, 100], 100.0)
+		b_fc2 = bias_variable('fc_biases_2', [100])
+		h_fc2 = tf.nn.relu(tf.matmul(h_fc1, W_fc2) + b_fc2)
 
-		# # Fully connected layer 3
-		# W_fc3 = weight_variable('fc_weights_3', [100, 10], 10.0)
-		# b_fc3 = bias_variable('fc_biases_3', [10])
-		# h_fc3 = tf.nn.relu(tf.matmul(h_fc2, W_fc3) + b_fc3)
+		# Fully connected layer 3
+		W_fc3 = weight_variable('fc_weights_3', [100, 10], 10.0)
+		b_fc3 = bias_variable('fc_biases_3', [10])
+		h_fc3 = tf.nn.relu(tf.matmul(h_fc2, W_fc3) + b_fc3)
 
-		# # Fully connected layer 4
-		# W_fc4 = weight_variable('fc_weights_4', [10, 1], 1.0)
-		# b_fc4 = bias_variable('fc_biases_4', [1])
-		# h_fc4 = tf.matmul(h_fc3, W_fc4) + b_fc4
+		# Fully connected layer 4
+		W_fc4 = weight_variable('fc_weights_4', [10, 1], 1.0)
+		b_fc4 = bias_variable('fc_biases_4', [1])
+		h_fc4 = tf.matmul(h_fc3, W_fc4) + b_fc4
 
-		# # radiants in the range of [-pi/2, pi/2] * 2 to get 360 range
-		# y = tf.multiply(tf.atan(h_fc4), 2)
+		# radiants in the range of [-pi/2, pi/2] * 2 to get 360 range
+		y = tf.multiply(tf.atan(h_fc4), 2)
 
 
 		#------------------OPTICAL FLOW---------------------------------
@@ -142,15 +136,37 @@ def train():
 		b_conv5_opt = bias_variable('conv_biases_5_opt', [64])
 		h_conv5_opt = tf.nn.relu(conv2d(h_conv4_opt, W_conv5_opt) + b_conv5_opt)
 
-		#concat the convolution results and flatten them
-		combined = tf.concat([h_conv5, h_conv5_opt], 3)
+		#stack result into one dimensional vector by using -1 option
+		conv_flat_opt = tf.reshape(h_conv5_opt, [BATCH_SIZE, -1]) 
 
-		pred = RNN(combined)
+		# Fully connected layer 1
+		W_fc1_opt = weight_variable('fc_weights_1_opt', [1 * 18 * 64, 1164], 1164.0)
+		b_fc1_opt = bias_variable('fc_biases_1_opt', [1164])
+		h_fc1_opt = tf.nn.relu(tf.matmul(conv_flat_opt, W_fc1_opt) + b_fc1_opt)
 
-		loss = loss_func(pred, labels)
+		# Fully connected layer 2
+		W_fc2_opt = weight_variable('fc_weights_2_opt', [1164, 100], 100.0)
+		b_fc2_opt = bias_variable('fc_biases_2_opt', [100])
+		h_fc2_opt = tf.nn.relu(tf.matmul(h_fc1_opt, W_fc2_opt) + b_fc2_opt)
+
+		# Fully connected layer 3
+		W_fc3_opt = weight_variable('fc_weights_3_opt', [100, 10], 10.0)
+		b_fc3_opt = bias_variable('fc_biases_3_opt', [10])
+		h_fc3_opt = tf.nn.relu(tf.matmul(h_fc2_opt, W_fc3_opt) + b_fc3_opt)
+
+		# Fully connected layer 4
+		W_fc4_opt = weight_variable('fc_weights_4_opt', [10, 1], 1.0)
+		b_fc4_opt = bias_variable('fc_biases_4_opt', [1])
+		h_fc4_opt = tf.matmul(h_fc3_opt, W_fc4_opt) + b_fc4_opt
+
+		# radiants in the range of [-pi/2, pi/2] * 2 to get 360 range
+		y_opt = tf.multiply(tf.atan(h_fc4_opt), 2)
+
+		#combined loss of original and optical flow
+		loss = loss_func(y, y_opt, labels)
 
 		# training operator for session call
-		train_op, lr = optimize(loss, global_step)
+		# train_op, lr = optimize(loss, global_step)
 
 		# max_to_keep option to store all weights
 		saver = tf.train.Saver(tf.global_variables(), max_to_keep=None)
@@ -160,7 +176,7 @@ def train():
 
 		#tensorboard
 		merged = tf.summary.merge_all()
-		train_writer = tf.summary.FileWriter('train_lstm', session.graph)
+		train_writer = tf.summary.FileWriter('train_opt', session.graph)
 
 		#initialization of all variables
 		session.run(tf.global_variables_initializer())
@@ -175,64 +191,44 @@ def train():
 		# ckpt = tf.train.get_checkpoint_state('./weights/')
 		# saver.restore(session, '/work/raymond/dlcv/dlcv_visnav/src/check_files/model99.ckpt-99')
 
-		logging.basicConfig(filename='../log/training_lstm_v2.log',level=logging.INFO)
+		logging.basicConfig(filename='../log/training_opt_eval.log',level=logging.INFO)
 
 
 		for x in range(NUM_ITER):
 			average_loss = 0.0
-			start_time = time.time()
-			curr_learnRate = 0.0
+			# start_time = time.time()
+			# curr_learnRate = 0.0
+
+			average_loss = 0.0
+			ckpt = tf.train.get_checkpoint_state('/work/raymond/dlcv/dlcv_visnav/src/check_files_opt/')
+
+			checkpoint_dir = '/work/raymond/dlcv/dlcv_visnav/src/check_files_opt/'
+			checkpoint_filename = 'opt_model'+str(x)+'.ckpt-'+str(x)
+			saver.restore(session, checkpoint_dir+checkpoint_filename)
+			print(checkpoint_filename + " loaded successfully...")
 
 			for y in range(NUM_BATCHES):
-				# print("testing...")
-				# summary, train_out, lossVal, image_out, label_out, lr_out = session.run([merged, train_op, loss, images, labels, lr])
-				# train_writer.add_summary(summary, x*NUM_ITER + y)
-				
-				summary, train_out, lossVal, lr_out = session.run([merged, train_op, loss, lr])
 
+				lossVal = session.run(loss)
 				print('iteration: ', x)
-				print("learning_rate: ", lr_out)
 				print('loss: ', lossVal)
-
-	
-
-				# #test layers for output
-				#iout, lout = session.run([fc_5, labels])
-				#print(lout)
-
-				# #------save image for verification-----
-				# images = tf.cast(images, tf.uint8)
-				# yuv = session.run(images)
-				# if x == 0 and y <= 3:
-				# 	newImg0 = pimg.fromarray(yuv[:,:,0])
-				# 	newImg1 = pimg.fromarray(yuv[:,:,1])
-				# 	newImg2 = pimg.fromarray(yuv[:,:,2])
-				# 	str1 = "img"
-				# 	str2 = str(y)
-				# 	str3 = ".png"
-				# 	print(str1+str2+str3)
-				# 	newImg0.save(str1+"y"+str2+str3, "PNG")
-				# 	newImg1.save(str1+"u"+str2+str3, "PNG")
-				# 	newImg2.save(str1+"v"+str2+str3, "PNG")
-
-				#if y > 3:
-				#	break
-				# #---------		
-
 				average_loss = average_loss+lossVal
+
 			# 	#print("done")
 				print('batch: ', y)
 				#print(lossVal)
 			# 	# print(image_out.shape)
-				curr_learnRate = lr_out
 				
 			# 	#break
 			
 			average_loss = average_loss/NUM_BATCHES
 			print("average_loss: ", average_loss)
+
+			content = x, checkpoint_filename, average_loss
+			logging.info(content)
 			
 			# str1 = str(x)
-			# str2 = "check_files_lstm_v2/lstm_model"
+			# str2 = "check_files/opt_model"
 			# str3 = ".ckpt"
 			# str4 = str2 + str1 + str3
 
@@ -243,14 +239,17 @@ def train():
 
 
 		
-		#train_writer.close()
+		train_writer.close()
 		
 		#tensorflow threads 
 		coord.request_stop()
 		coord.join(threads)
 
-def loss_func(logits, labels):
-	loss = tf.reduce_mean(tf.squared_difference(logits, labels))
+def loss_func(logits, logits_opt, labels):
+	loss_ori = tf.reduce_mean(tf.squared_difference(logits, labels))
+	loss_opt = tf.reduce_mean(tf.squared_difference(logits_opt, labels))
+
+	loss = 0.5 * (loss_ori + loss_opt)
 	
 	tf.add_to_collection('losses', loss)
 
@@ -315,30 +314,6 @@ def optimize(total_loss, global_step):
 		train_op = tf.no_op(name='train')
 
 	return train_op, lr
-
-def RNN(x):
-	batch_x = tf.reshape(x, [BATCH_SIZE, N_STEPS, N_INPUT])
-
-	# Unstack to get a list of 'n_steps' tensors of shape (batch_size, n_input)
-	x_unstack = tf.unstack(batch_x, N_STEPS, 1)
-
-	# Define a lstm cell with tensorflow
-	lstm_cell = rnn.BasicLSTMCell(N_HIDDEN, forget_bias=1.0)
-
-	# Get lstm cell output
-	outputs, states = rnn.static_rnn(lstm_cell, x_unstack, dtype=tf.float32)
-
-	W_fc1_opt = weight_variable('lstm_weights_1', [N_HIDDEN, 1], float(N_HIDDEN))
-	b_fc1_opt = bias_variable('lstm_bias_1', [1])
-
-	outputs = tf.matmul(outputs[-1], W_fc1_opt) + b_fc1_opt
-
-	# radiants in the range of [-pi/2, pi/2] * 2 to get 360 range
-	y_opt = tf.multiply(tf.atan(outputs), 2)
-
-
-	return y_opt
-
 
 def conv2d(x, W):
 	"""conv2d returns a 2d convolution layer with full stride."""

@@ -11,12 +11,12 @@ from tensorflow.contrib import rnn
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
-BATCH_SIZE = 45
+BATCH_SIZE = 49
 NUM_THREADS = 16
-NUM_SAMPLES = 45405
+NUM_SAMPLES = 6811
 NUM_BATCHES = int(NUM_SAMPLES/BATCH_SIZE)
 MIN_QUEUE_SIZE = int(NUM_SAMPLES * 0.4)
-NUM_ITER = 100000
+NUM_ITER = 201
 
 MOVING_AVERAGE_DECAY = 0.9999
 NUM_EPOCHS_PER_DECAY = 300.0       	# Epochs after which learning rate decays.
@@ -36,7 +36,7 @@ def train():
 
 		global_step = tf.Variable(0, name='global_step', trainable=False)
 
-		im, la = pre.get_full_train()
+		im, la = pre.get_val()
 		images, labels = pre.read_opt_data(im, la, BATCH_SIZE, NUM_SAMPLES, False)
 
 		#split images into original and optical flow
@@ -150,7 +150,7 @@ def train():
 		loss = loss_func(pred, labels)
 
 		# training operator for session call
-		train_op, lr = optimize(loss, global_step)
+		# train_op, lr = optimize(loss, global_step)
 
 		# max_to_keep option to store all weights
 		saver = tf.train.Saver(tf.global_variables(), max_to_keep=None)
@@ -159,8 +159,8 @@ def train():
 		session = tf.Session()
 
 		#tensorboard
-		merged = tf.summary.merge_all()
-		train_writer = tf.summary.FileWriter('train_lstm', session.graph)
+		# merged = tf.summary.merge_all()
+		# train_writer = tf.summary.FileWriter('train_lstm', session.graph)
 
 		#initialization of all variables
 		session.run(tf.global_variables_initializer())
@@ -175,61 +175,37 @@ def train():
 		# ckpt = tf.train.get_checkpoint_state('./weights/')
 		# saver.restore(session, '/work/raymond/dlcv/dlcv_visnav/src/check_files/model99.ckpt-99')
 
-		logging.basicConfig(filename='../log/training_lstm_v2.log',level=logging.INFO)
+		logging.basicConfig(filename='../log/training_lstm_eval.log',level=logging.INFO)
 
 
 		for x in range(NUM_ITER):
 			average_loss = 0.0
-			start_time = time.time()
-			curr_learnRate = 0.0
+			
+			ckpt = tf.train.get_checkpoint_state('/work/raymond/dlcv/dlcv_visnav/src/check_files_lstm/')
+
+			checkpoint_dir = '/work/raymond/dlcv/dlcv_visnav/src/check_files_lstm/'
+			checkpoint_filename = 'lstm_model'+str(x)+'.ckpt-'+str(x)
+			saver.restore(session, checkpoint_dir+checkpoint_filename)
+			print(checkpoint_filename + " loaded successfully...")
 
 			for y in range(NUM_BATCHES):
-				# print("testing...")
-				# summary, train_out, lossVal, image_out, label_out, lr_out = session.run([merged, train_op, loss, images, labels, lr])
-				# train_writer.add_summary(summary, x*NUM_ITER + y)
-				
-				summary, train_out, lossVal, lr_out = session.run([merged, train_op, loss, lr])
-
+				lossVal = session.run(loss)
 				print('iteration: ', x)
-				print("learning_rate: ", lr_out)
 				print('loss: ', lossVal)
-
-	
-
-				# #test layers for output
-				#iout, lout = session.run([fc_5, labels])
-				#print(lout)
-
-				# #------save image for verification-----
-				# images = tf.cast(images, tf.uint8)
-				# yuv = session.run(images)
-				# if x == 0 and y <= 3:
-				# 	newImg0 = pimg.fromarray(yuv[:,:,0])
-				# 	newImg1 = pimg.fromarray(yuv[:,:,1])
-				# 	newImg2 = pimg.fromarray(yuv[:,:,2])
-				# 	str1 = "img"
-				# 	str2 = str(y)
-				# 	str3 = ".png"
-				# 	print(str1+str2+str3)
-				# 	newImg0.save(str1+"y"+str2+str3, "PNG")
-				# 	newImg1.save(str1+"u"+str2+str3, "PNG")
-				# 	newImg2.save(str1+"v"+str2+str3, "PNG")
-
-				#if y > 3:
-				#	break
-				# #---------		
-
 				average_loss = average_loss+lossVal
+
 			# 	#print("done")
 				print('batch: ', y)
 				#print(lossVal)
 			# 	# print(image_out.shape)
-				curr_learnRate = lr_out
 				
 			# 	#break
 			
 			average_loss = average_loss/NUM_BATCHES
 			print("average_loss: ", average_loss)
+
+			content = x, checkpoint_filename, average_loss
+			logging.info(content)
 			
 			# str1 = str(x)
 			# str2 = "check_files_lstm_v2/lstm_model"
