@@ -119,7 +119,7 @@
     \column{0.4}
     \block{Abstract}{
     An important component in autonomous vehicles is visual navigation. We used a sequence of frames recorded at the front of the car to predict the steering angle using an end to end approach. 
-Our network is based on Bojarski et al.\cite{DBLP:journals/corr/BojarskiTDFFGJM16} which consists of five convolutional and three fully connected layers using the human steering angle as the training signal. As this model did not fully exploit the temporal information of image sequences, we extended this architecture by training an additional convolutional network with {\em optical flow} computed from the original images as input and optimizing over the combined loss. As this approach yielded good results, we trained a third network consisting of a {\em Long-Short term memory} (LSTM) cell to further exploit temporal information. We achieved an improvement of 0.12 in the Mean Squared Error in our approach compared to Nvidia?s model.
+Our network is based on Bojarski et al.\cite{DBLP:journals/corr/BojarskiTDFFGJM16} which consists of five convolutional and three fully connected layers with the steering angle as the training signal. In order to incorporate motion information, we extended this architecture by training an additional convolutional network with {\em optical flow} computed from the images and optimized over the combined loss. As this approach yielded good results, we explored a third architecture consisting of a {\em Long-Short term memory} (LSTM) cell to further exploit temporal information. Our LSTM model achieved an improvement of 0.12 in the Mean Squared Error compared to Nvidia's model.
    }
    
     \block{Data Preprocessing}{
@@ -138,7 +138,7 @@ Our network is based on Bojarski et al.\cite{DBLP:journals/corr/BojarskiTDFFGJM1
     }
     \block{Training and Evaluation Loss}{
     	\begin{tikzfigure}			
-		\vbox{\vspace{-10mm} \includegraphics[trim={0 0 0 5cm},clip,scale=0.45]{images/train_eval_v5}}
+		\vbox{\vspace{-10mm} \includegraphics[trim={1 1 1 5cm},clip,scale=0.45]{images/train_eval_v5}}
     	\end{tikzfigure}
     }
     \block{Test Results}{
@@ -152,7 +152,7 @@ Our network is based on Bojarski et al.\cite{DBLP:journals/corr/BojarskiTDFFGJM1
 		MSE & 0.1911 & 0.1910  & \textbf{0.072} \\
 	\end{tabular}}
 
-	The values above are in radians. Compared in Degrees: $0.19\text{ rad} \approx 11^\circ\text{C}$, $0.072\text{ rad} \approx 4^\circ\text{C}$.
+	The values above are in radians. Conversion to degrees leads to: $0.19\text{ rad} \approx 11^\circ$, $0.072\text{ rad} \approx 4^\circ$.
     } 
     
     \column{0.2}
@@ -171,7 +171,7 @@ Our network is based on Bojarski et al.\cite{DBLP:journals/corr/BojarskiTDFFGJM1
 	\end{align*}}
 
     \block{Our Approach}{
-    We converted RGB images into YUV color space, which encodes the human perception.We trained all networks using mini-batch Stochastic Gradient Descent with a learning rate of 0.001 over 200 epochs. For the Nvidia and CNN+Optical Flow network we consider a balanced subset of the training data in order to reduce the number of samples where the car is driving straight. However this was not applied to the LSTM model due to the requirement of having sequential images. In our experiments we have shown that the LSTM model converges faster during training and achieves a better performance for testing.
+    We converted RGB images into YUV color space, which encodes the human perception.We trained all networks using mini-batch Stochastic Gradient Descent with a learning rate of 0.001 over 200 epochs. For the Nvidia and CNN+Optical Flow network, we considered a balanced subset of the training data in order to reduce the number of samples where the car is driving straight. However this was not applied to the LSTM model due to the requirement of having sequential images. In our experiments, we have shown that the LSTM model converges faster during training and achieves a better performance in the testing phase.
      }
     \block{References}{
     	{\footnotesize

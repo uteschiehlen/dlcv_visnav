@@ -1,7 +1,6 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2017.1.1)  4 AUG 2017 16:07
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.6.16)  5 AUG 2017 10:59
 entering extended mode
  restricted \write18 enabled.
- file:line:error style messages enabled.
  %&-line parsing enabled.
 **dl4cv_tikzposter_template.tex
 (./dl4cv_tikzposter_template.tex
@@ -1357,7 +1356,7 @@ File: images/train_eval_v5.png Graphic file (type png)
 
 <use images/train_eval_v5.png>
 Package pdftex.def Info: images/train_eval_v5.png used on input line 143.
-(pdftex.def)             Requested size: 734.97913pt x 528.51814pt.
+(pdftex.def)             Requested size: 734.07576pt x 528.06647pt.
 LaTeX Font Info:    Calculating math sizes for size <4> on input line 156.
 
 
@@ -1453,7 +1452,7 @@ LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
  ) 
 Here is how much of TeX's memory you used:
  28205 strings out of 493014
- 706266 string characters out of 6133352
+ 706266 string characters out of 6133351
  947525 words of memory out of 5000000
  31142 multiletter control sequences out of 15000+600000
  62064 words of font info for 131 fonts, out of 8000000 for 9000
@@ -1468,7 +1467,7 @@ sr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr
 /local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/lo
 cal/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/loc
 al/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on dl4cv_tikzposter_template.pdf (1 page, 785052 bytes).
+Output written on dl4cv_tikzposter_template.pdf (1 page, 785005 bytes).
 PDF statistics:
  100 PDF objects out of 1000 (max. 8388607)
  61 compressed objects within 1 object stream
