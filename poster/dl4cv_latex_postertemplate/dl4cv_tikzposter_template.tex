@@ -166,8 +166,8 @@ Our network is based on Bojarski et al.\cite{DBLP:journals/corr/BojarskiTDFFGJM1
     }
     \block{Loss Functions}{
     	\begin{align*}
-	loss_{opt} &= \sum (y_{orig} - labels)^2 + (y_{opt} - labels)^2 \\
-	loss_{lstm} &= \sum (y - labels)^2 
+	loss_{opt} &= \frac{1}{N}\sum_i (y_{orig} - labels)^2 + (y_{opt} - labels)^2 \\
+	loss_{lstm} &= \frac{1}{N}\sum_i (y - labels)^2 
 	\end{align*}}
 
     \block{Our Approach}{
