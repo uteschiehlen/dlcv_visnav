@@ -1,5 +1,5 @@
 # End-to-End learning for Visual Navigation
-By @raymondchua, @Natalie1993 and @uteschiehlen
+By [Raymond Chua](https://github.com/raymondchua), @Natalie1993 and @uteschiehlen
 
 
 
