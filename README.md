@@ -10,6 +10,8 @@ Deep Learning Course Project at Technical University of Munich.
 4. Training and Evaluation
 6. Test Results
 7. Poster Presentation at Technical University of Munich.
+8. References
+
 
 ### Introduction
 
@@ -42,4 +44,13 @@ The values above are in radians. 0.19 is about 11 degrees and 0.072 is about 4 d
 ### Poster Presentation at Technical University of Munich.
 ![Poster](https://github.com/uteschiehlen/dlcv_visnav/blob/master/poster/dl4cv_latex_postertemplate/poster_final.png "Poster Presentation")
 
-You can find our project proposal in the dlcv-proposal folder. 
+### References
+[1] Udacity Self-driving-car dataset. https://github.com/udacity/self-driving-car/tree/master/datasets/CH2. Accessed: 2017-06-26.1
+[2] M. Bojarski, D. D. Testa, D. Dworakowski, B. Firner,B. Flepp, P. Goyal, L. D. Jackel, M. Monfort, U. Muller,J. Zhang, X. Zhang, J. Zhao, and K. Zieba. End to end learning for self-driving cars. CoRR, abs/1604.07316, 2016. 1,2
+[3] S. Hochreiter and J. Schmidhuber. Long short-term memory. Neural Computation, 9(8):1735–1780, 1997. 1
+[4] J. Y. Ng, M. J. Hausknecht, S. Vijayanarasimhan, O. Vinyals, R. Monga, and G. Toderici. Beyond short snippets: Deep networks for video classification. In IEEE Conference on Computer Vision and Pattern Recognition, CVPR 2015, Boston, MA, USA, June 7-12, 2015, pages 4694–4702, 2015.1
+[5] M. Oquab, L. Bottou, I. Laptev, and J. Sivic. Is object localization for free? - weakly-supervised learning with convolutional
+neural networks. In CVPR, pages 685–694. IEEE Computer Society, 2015. 1
+[6] P. Sermanet, D. Eigen, X. Zhang, M. Mathieu, R. Fergus, and Y. LeCun. Overfeat: Integrated recognition, localization and detection using convolutional networks. CoRR, abs/1312.6229, 2013. 1
+[7] E. Shelhamer, J. Long, and T. Darrell. Fully convolutional networks for semantic segmentation. IEEE Trans. Pattern Anal. Mach. Intell., 39(4):640–651, 2017. 1
+[8] K. Simonyan and A. Zisserman. Two-stream convolutional networks for action recognition in videos. In Advances in Neural Information Processing Systems 27: Annual Conference on Neural Information Processing Systems 2014, December 8-13 2014, Montreal, Quebec, Canada, pages 568–576, 2014. 1
