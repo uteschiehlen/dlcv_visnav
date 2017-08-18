@@ -34,7 +34,7 @@ For the Nvidia and CNN+Optical Flow network, we considered a balanced subset of 
 
 ### Test Results
 | Model        	| Nvidia        | Nvidia + Optical Flow | Nvidia + Optical Flow + LSTM |
-| ------------- |:-------------:| :--------------------:| ----------------------------:|
+| ------------- |:-------------:| :--------------------:| :---------------------------:|
 | MSE     		| 0.1911 		| 0.1910				|0.072						   |
 
 The values above are in radians. 0.19 is about 11 degrees and 0.072 is about 4 degrees.
