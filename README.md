@@ -42,7 +42,7 @@ The values above are in radians. 0.19 is about 11 degrees and 0.072 is about 4 d
 
 
 ### Poster Presentation at Technical University of Munich.
-![Poster](https://github.com/uteschiehlen/dlcv_visnav/blob/master/poster/dl4cv_latex_postertemplate/dl4cv_tikzposter_template.pdf "Poster Presentation")
+![Poster](https://github.com/uteschiehlen/dlcv_visnav/blob/master/poster/dl4cv_latex_postertemplate/final_poster.png "Poster Presentation")
 
 ### References
 1. Udacity Self-driving-car dataset. https://github.com/udacity/self-driving-car/tree/master/datasets/CH2. Accessed: 2017-06-26.1
