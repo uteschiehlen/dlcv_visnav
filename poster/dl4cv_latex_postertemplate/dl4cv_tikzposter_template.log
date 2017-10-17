@@ -1,6 +1,7 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.6.16)  10 AUG 2017 23:17
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2017.1.1)  17 OCT 2017 22:46
 entering extended mode
  restricted \write18 enabled.
+ file:line:error style messages enabled.
  %&-line parsing enabled.
 **dl4cv_tikzposter_template.tex
 (./dl4cv_tikzposter_template.tex
@@ -1318,15 +1319,15 @@ LaTeX Font Info:    Try loading font information for U+msb on input line 117.
 (/usr/local/texlive/2016/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<tum_logo.pdf, id=29, 742.775pt x 391.4625pt>
-File: tum_logo.pdf Graphic file (type pdf)
- <use tum_logo.pdf>
-Package pdftex.def Info: tum_logo.pdf used on input line 117.
+<images/tum_logo.pdf, id=29, 742.775pt x 391.4625pt>
+File: images/tum_logo.pdf Graphic file (type pdf)
+ <use images/tum_logo.pdf>
+Package pdftex.def Info: images/tum_logo.pdf used on input line 117.
 (pdftex.def)             Requested size: 426.79134pt x 224.93387pt.
-File: tum_logo.pdf Graphic file (type pdf)
+File: images/tum_logo.pdf Graphic file (type pdf)
 
-<use tum_logo.pdf>
-Package pdftex.def Info: tum_logo.pdf used on input line 117.
+<use images/tum_logo.pdf>
+Package pdftex.def Info: images/tum_logo.pdf used on input line 117.
 (pdftex.def)             Requested size: 426.79134pt x 224.93387pt.
 
 <images/preprocessingImg.pdf, id=30, 763.85374pt x 62.2325pt>
@@ -1351,12 +1352,12 @@ Overfull \hbox (4.66788pt too wide) in paragraph at lines 138--138
 [][] 
  []
 
-<images/train_eval_v5.png, id=32, 1633.302pt x 1316.7594pt>
-File: images/train_eval_v5.png Graphic file (type png)
+<images/train_eval_v7.png, id=32, 607.068pt x 340.8735pt>
+File: images/train_eval_v7.png Graphic file (type png)
 
-<use images/train_eval_v5.png>
-Package pdftex.def Info: images/train_eval_v5.png used on input line 143.
-(pdftex.def)             Requested size: 734.07576pt x 528.06647pt.
+<use images/train_eval_v7.png>
+Package pdftex.def Info: images/train_eval_v7.png used on input line 143.
+(pdftex.def)             Requested size: 1028.59848pt x 335.92871pt.
 LaTeX Font Info:    Calculating math sizes for size <4> on input line 156.
 
 
@@ -1396,13 +1397,13 @@ LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <2> not available
 (Font)              size <5> substituted on input line 156.
 
 \my@colheighta=\dimen331
-<images/img5211.jpg, id=35, 456.70625pt x 256.96pt>
+<images/img5211.jpg, id=34, 456.70625pt x 256.96pt>
 File: images/img5211.jpg Graphic file (type jpg)
  <use images/img5211.jpg>
 Package pdftex.def Info: images/img5211.jpg used on input line 166.
 (pdftex.def)             Requested size: 548.04475pt x 308.35045pt.
 
-<images/opt5211.png, id=36, 456.70625pt x 256.96pt>
+<images/opt5211.png, id=35, 456.70625pt x 256.96pt>
 File: images/opt5211.png Graphic file (type png)
  <use images/opt5211.png>
 Package pdftex.def Info: images/opt5211.png used on input line 166.
@@ -1420,13 +1421,13 @@ Overfull \hbox (56.38974pt too wide) in paragraph at lines 171--171
 (./dl4cv_tikzposter_template.bbl)
 \my@colheightb=\dimen332
 
-<images/modelOpt.pdf, id=37, 599.23875pt x 641.39626pt>
+<images/modelOpt.pdf, id=36, 599.23875pt x 641.39626pt>
 File: images/modelOpt.pdf Graphic file (type pdf)
 
 <use images/modelOpt.pdf>
 Package pdftex.def Info: images/modelOpt.pdf used on input line 194.
 (pdftex.def)             Requested size: 1198.47458pt x 1282.78937pt.
- <images/LSTM-4.pdf, id=38, 1373.13pt x 565.11125pt>
+ <images/LSTM-4.pdf, id=37, 1373.13pt x 565.11125pt>
 File: images/LSTM-4.pdf Graphic file (type pdf)
 
 <use images/LSTM-4.pdf>
@@ -1438,18 +1439,21 @@ Package pdftex.def Info: images/LSTM-4.pdf used on input line 194.
  [1
 
 {/usr/local/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./image
-s/train_eval_v5.png> <./tum_logo.pdf> <./images/preprocessingImg.pdf> <./images
-/preprocessingLabel.pdf> <./images/img5211.jpg> <./images/opt5211.png (PNG copy
-)> <./images/modelOpt.pdf> <./images/LSTM-4.pdf>]
-(./dl4cv_tikzposter_template.aux)
+s/tum_logo.pdf> <./images/preprocessingImg.pdf> <./images/preprocessingLabel.pd
+f> <./images/train_eval_v7.png> <./images/img5211.jpg> <./images/opt5211.png (P
+NG copy)> <./images/modelOpt.pdf> <./images/LSTM-4.pdf>] (./dl4cv_tikzposter_te
+mplate.aux)
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 3.0pt have occurred.
 
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
  ) 
 Here is how much of TeX's memory you used:
  28205 strings out of 493014
- 706266 string characters out of 6133351
+ 706294 string characters out of 6133352
  947525 words of memory out of 5000000
  31142 multiletter control sequences out of 15000+600000
  62064 words of font info for 131 fonts, out of 8000000 for 9000
@@ -1464,10 +1468,10 @@ sr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr
 /local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/lo
 cal/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/loc
 al/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on dl4cv_tikzposter_template.pdf (1 page, 785335 bytes).
+Output written on dl4cv_tikzposter_template.pdf (1 page, 625208 bytes).
 PDF statistics:
- 100 PDF objects out of 1000 (max. 8388607)
- 61 compressed objects within 1 object stream
+ 98 PDF objects out of 1000 (max. 8388607)
+ 60 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 155 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 149 words of extra memory for PDF output out of 10000 (max. 10000000)
 

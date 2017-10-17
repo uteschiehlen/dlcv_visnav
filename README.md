@@ -17,20 +17,20 @@ Deep Learning Course Project at Technical University of Munich.
 
 This repository contains the code, proposal and the poster for our project, "End to end Learning for Visual Navigation". This is for the "Deep Learning for Computer Vision" course offered in Summer 2017 at the Technical University of Munich. 
 
-We attempt to solve a supervised learning problem for autonomous driving. The training data consists of RGB image sequences with the steering angles as training labels. The project is motivated by Nvidia's paper, "End to end Learning for Self Driving Cars." We considered additional data in the form of Optical Flow which improves the training. However the performance on the test set was marginal. In addition, we consider using a LSTM cell to learn about dependencies in the sequence. This model causes faster convergence during the training phase and shown a 0.12 improvement in the test set. The error improved from 11 degrees from the Nvidia's model to 4 degrees in our LSTM based model. 
+We attempted to solve a supervised learning problem for autonomous driving. The training data consisted of RGB image sequences with the steering angles as training labels. The project is motivated by Nvidia's paper, "End to end Learning for Self Driving Cars." We considered additional data in the form of Optical Flow which improved the training, however the performance on the test set was marginal. In addition, we considered using a LSTM cell to learn about dependencies in the sequence. This model caused faster convergence during the training phase and resulted in a 0.12 improvement of the mean squared error in the test set. The error improved from 11 degrees from the Nvidia's model to 4 degrees in our LSTM based model. 
 
 ### Data Preprocessing
-We perform data augmentation during the preprocessing phase. This is done by applying random horizontal flip to the RGB images. If the image is flipped, we compensate on the steering angle by multiplying it's value with -1. We then normalize the image to [0,1] by dividing the pixel values with 255. In order to encode human perception better, the RGB images are then converted to YUV colorspace. The YUV images are then subtracted by their respective mean values. 
+We performed data augmentation during the preprocessing phase. At first a random horizontal flip was applied to the RGB images and the corresponding steering angle multiplied with -1. We then normalized the image to [0,1] by dividing the pixel values with 255. In order to encode human perception better, the RGB images were then converted to YUV colorspace. Afterwards, the YUV images were zero-mean centered by subtracting their respective mean values.
 
 ### Our Approach
 ![Network Architecture](https://github.com/uteschiehlen/dlcv_visnav/blob/master/poster/images/modelOpt.png "Nvidia, Nvidia + Optical Flow, CNN + Optical Flow + LSTM")
 
-We first build the model based on Nvidia's paper. However, during training, we observed that the loss converged to a value of 2.5. We argue that this is due to the lack of complexity of Nvidia's model. We then add a sub-network with Optical Flow as inputs. The training loss converges to near zero. However, the improvement on the test set is marginal. We then build a LSTM based model by concatenting the features of the YUV images as well as the Optical Flow data and used them as inputs for the LSTM cell. The whole network is trained end to end in order to fully exploit the data. All networks are trained using mini-batch Stochastic Gradient Descent with a learning rate of 0.001 over 200 epochs. We used a Mean Square Error (MSE) as our loss function. In our experiments, we have shown that the LSTM model converges faster during training and achieves a better performance in the testing phase. 
+We first build the model based on Nvidia's paper. However, during training, we observed that the loss converged to a value of 2.5. We argue that this is due to the lack of complexity of Nvidia's model. We then added a sub-network with Optical Flow as inputs, which resulted in a near zero training loss convergence. However, the improvement on the test set remained marginal. We then build a LSTM based model by concatenting the features of the YUV images as well as the Optical Flow data and used them as inputs for the LSTM cell. The whole network was trained end to end in order to fully exploit the data. All networks were trained using mini-batch Stochastic Gradient Descent with a learning rate of 0.001 over 200 epochs. We used a Mean Square Error (MSE) as our loss function. In our experiments, we have shown that the LSTM model converges faster during training and achieves a better performance in the testing phase. 
 
 ### Training and Evaluation
 ![Training and Evaluation](https://github.com/uteschiehlen/dlcv_visnav/blob/master/poster/images/train_eval_v7.png "Training and Validation Loss")
 
-For the Nvidia and CNN+Optical Flow network, we considered a balanced subset of the training data in order to reduce the number of samples where the car is driving straight. However this was not applied to the LSTM model due to the requirement of having sequential images. The training for the Nvidia's model and Optical Flow model takes about 140 epochs to converge. The LSTM model takes only 80 epochs to converge. Since the validation set has similar environment settings to the training set, it is unsurprising that the loss value is similar to their respective training loss. 
+For the Nvidia and CNN+Optical Flow network, we considered a balanced subset of the training data in order to reduce the number of samples where the car is driving straight. However this was not applied to the LSTM model due to the requirement of having sequential images. The training for the Nvidia and Optical Flow model converged in about 140 epochs. The LSTM model needed only 80 epochs to converge. Since the validation set had similar environment settings to the training set, it is unsurprising that the loss value is similar to their respective training loss. 
 
 ### Test Results
 | Model        	| Nvidia        | Nvidia + Optical Flow | Nvidia + Optical Flow + LSTM |
@@ -42,7 +42,7 @@ The values above are in radians. 0.19 is about 11 degrees and 0.072 is about 4 d
 
 
 ### Poster Presentation at Technical University of Munich.
-![Poster](https://github.com/uteschiehlen/dlcv_visnav/blob/master/poster/dl4cv_latex_postertemplate/poster_final.png "Poster Presentation")
+![Poster](https://github.com/uteschiehlen/dlcv_visnav/blob/master/poster/dl4cv_latex_postertemplate/dl4cv_tikzposter_template.png "Poster Presentation")
 
 ### References
 1. Udacity Self-driving-car dataset. https://github.com/udacity/self-driving-car/tree/master/datasets/CH2. Accessed: 2017-06-26.1
